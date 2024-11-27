@@ -1,17 +1,32 @@
 -- match_queries.sql
+-- Insert a new match
+-- Arguments: {home_team_id}, {away_team_id}, {tournament_id}, {match_date}, {match_time}, {match_status}, {home_team_score}, {away_team_score}
+INSERT INTO Matches (
+    home_team_id, away_team_id, tournament_id, match_date, match_time, match_status, home_team_score, away_team_score
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
--- Query to get match results for a specific tournament
-SELECT m.match_date, ht.team_name AS home_team, at.team_name AS away_team,
-       m.home_team_score, m.away_team_score, m.match_status
-FROM Matches m
-JOIN Teams ht ON m.home_team_id = ht.team_id
-JOIN Teams at ON m.away_team_id = at.team_id
-WHERE m.tournament_id = 1;
+-- Retrieve all matches in a tournament
+-- Arguments: {tournament_id}
+SELECT * 
+FROM Matches 
+WHERE tournament_id = ?;
 
--- Query to list all scheduled matches for a specific team
-SELECT m.match_date, m.match_time, ht.team_name AS home_team, at.team_name AS away_team
-FROM Matches m
-JOIN Teams ht ON m.home_team_id = ht.team_id
-JOIN Teams at ON m.away_team_id = at.team_id
-WHERE (m.home_team_id = 3 OR m.away_team_id = 3)
-  AND m.match_status = 'Scheduled';
+-- Retrieve matches for a specific team
+-- Arguments: {team_id}
+SELECT * 
+FROM Matches 
+WHERE home_team_id = ? OR away_team_id = ?;
+
+-- Retrieve match summary stats
+-- Arguments: {match_id}
+SELECT 
+    ts.team_id, ts.possession_percent, ts.shots, ts.expected_goals, ts.passes, ts.tackles, ts.tackles_won, 
+    ts.fouls_committed, ts.offsides, ts.corners, ts.free_kicks, ts.penalty_kicks, ts.yellow_cards, ts.red_cards
+FROM Team_Match_Stats ts
+WHERE ts.match_id = ?;
+
+-- Update match details
+-- Arguments: {match_id}, {match_date}, {match_time}, {match_status}, {home_team_score}, {away_team_score}
+UPDATE Matches
+SET match_date = ?, match_time = ?, match_status = ?, home_team_score = ?, away_team_score = ?
+WHERE match_id = ?;

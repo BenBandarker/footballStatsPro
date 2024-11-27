@@ -11,7 +11,7 @@ CREATE TABLE Players (
     player_name VARCHAR(100) NOT NULL,
     team_id INT,
     date_of_birth DATE,
-    position VARCHAR(50),
+    position VARCHAR(100),
     nationality VARCHAR(50),
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
@@ -40,46 +40,74 @@ CREATE TABLE MATCHES (
     FOREIGN KEY (tournament_id) REFERENCES TOURNAMENTS(tournament_id)
 );
 
-CREATE TABLE Players_Stats(
-    stat_id INT PRIMARY KEY AUTO_INCREMENT,
-    match_id INT NOT NULL,
+CREATE TABLE Player_Performance (
+    performance_id INT PRIMARY KEY AUTO_INCREMENT,
     player_id INT NOT NULL,
-    minutes_played INT NOT NULL,
+    match_id INT NOT NULL,
+    minutes_played INT,
+    distance_covered DECIMAL(5, 2),
+    distance_sprinted DECIMAL(5, 2),
     goals INT DEFAULT 0,
     assists INT DEFAULT 0,
-    yellow_cards INT DEFAULT 0,
-    red_cards INT DEFAULT 0,
-    FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (player_id) REFERENCES Players(player_id)
+    shots INT DEFAULT 0,
+    shot_accuracy DECIMAL(5, 2),
+    passes INT DEFAULT 0,
+    pass_accuracy DECIMAL(5, 2),
+    tackles INT DEFAULT 0,
+    tackles_won INT DEFAULT 0,
+    fouls_committed INT DEFAULT 0,
+    possession_won INT DEFAULT 0,
+    possession_lost INT DEFAULT 0,
+    dribbles INT DEFAULT 0,
+    dribbles_completed INT DEFAULT 0,
+    dribble_success_rate DECIMAL(5, 2),
+    match_rating DECIMAL(3, 2),
+    player_of_the_match BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (player_id) REFERENCES Players(player_id),
+    FOREIGN KEY (match_id) REFERENCES Matches(match_id)
 );
 
-CREATE TABLE Matches_Stats(
-    team_stat_id INT PRIMARY KEY AUTO_INCREMENT,
+
+
+CREATE TABLE Team_Match_Stats (
+    stat_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
     team_id INT NOT NULL,
     possession_percent DECIMAL(5, 2),
     shots INT DEFAULT 0,
-    shots_on_target INT DEFAULT 0,
-    fouls INT DEFAULT 0,
-    corners INT DEFAULT 0,
+    expected_goals DECIMAL(5, 2),
+    passes INT DEFAULT 0,
+    tackles INT DEFAULT 0,
+    tackles_won INT DEFAULT 0,
+    fouls_committed INT DEFAULT 0,
     offsides INT DEFAULT 0,
+    corners INT DEFAULT 0,
+    free_kicks INT DEFAULT 0,
+    penalty_kicks INT DEFAULT 0,
     yellow_cards INT DEFAULT 0,
     red_cards INT DEFAULT 0,
     FOREIGN KEY (match_id) REFERENCES Matches(match_id),
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
 
-CREATE TABLE Match_Events (
-    event_id INT PRIMARY KEY AUTO_INCREMENT,         -- Unique ID for each event
-    match_id INT NOT NULL,                           -- Link to the match where the event occurred
-    team_id INT NOT NULL,                            -- Team involved in the event
-    player_id INT NULL,                              -- Player involved (if applicable)
-    event_type ENUM('Goal', 'Assist', 'Foul', 'Yellow Card', 
-                    'Red Card', 'Substitution', 
-                    'Offside', 'Penalty', 'Injury') NOT NULL, -- Type of event
-    event_time INT NOT NULL,                         -- Minute of the match the event occurred
-    additional_info VARCHAR(255),                   -- Extra details (e.g., "Penalty scored" or "Injury substitution")
+CREATE TABLE Player_Events (
+    event_id INT PRIMARY KEY AUTO_INCREMENT,
+    match_id INT NOT NULL,
+    player_id INT NOT NULL,
+    event_type ENUM('Goal', 'Assist', 'Foul', 'Yellow Card', 'Red Card', 
+                    'Shot', 'Save', 'Miss', 'Interception', 'Clearance',  'Injury', 'Substitution'),
+    event_time INT NOT NULL,
     FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (team_id) REFERENCES Teams(team_id),
     FOREIGN KEY (player_id) REFERENCES Players(player_id)
+);
+
+
+CREATE TABLE Team_Events (
+    event_id INT PRIMARY KEY AUTO_INCREMENT,
+    match_id INT NOT NULL,
+    team_id INT NOT NULL,
+    event_type ENUM('Goal', 'Corner', 'Offside', 'Foul', 'Penalty'),
+    event_time INT NOT NULL,
+    FOREIGN KEY (match_id) REFERENCES Matches(match_id),
+    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
