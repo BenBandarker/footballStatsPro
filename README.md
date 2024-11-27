@@ -2,7 +2,7 @@
 
 # **Soccer Stats Project**  
 A multi-stage backend project for managing soccer statistics. This project evolves through various stages, incorporating SQL databases, APIs, cloud services (AWS), microservices architecture, and machine learning.  
-authors: Ben Bandarker, Or Salem.
+authors- Ben Bandarker, Or Salem.
 ---
 
 ## **Project Overview**  
