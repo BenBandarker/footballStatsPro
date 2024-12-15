@@ -146,4 +146,5 @@ soccer-stats-project/
   - add Contollers to statisics.
   - add code to insert the data to databases.
     - add code to change data on sql base on existing data.
-  - add entitys \ 
+  - add entitys \
+    - including matches entity + videoAPI
