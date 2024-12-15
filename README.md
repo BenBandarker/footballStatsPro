@@ -137,3 +137,13 @@ soccer-stats-project/
 
 ---
 
+
+
+## TODO
+## API
+  - add init + update to api data
+  - expand Controllers - more fetch funcion - with paramaters
+  - add Contollers to statisics.
+  - add code to insert the data to databases.
+    - add code to change data on sql base on existing data.
+  - add entitys \ 
