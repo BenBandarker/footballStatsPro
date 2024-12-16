@@ -2,7 +2,8 @@ const { fetchData } = require('../services/apiService');
 
 async function importTournaments(req, res) {
   try {
-    const tournaments = await fetchData('tournaments-endpoint'); // Replace with the correct endpoint
+    const { country } = req.params;
+    const tournaments = await fetchData('apiOne',`v3/leagues?country=${country}`);
     // Code to save tournaments to the database using SQL
     res.status(201).send('Tournaments imported successfully');
   } catch (error) {

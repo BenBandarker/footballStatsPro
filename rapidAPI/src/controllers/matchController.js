@@ -2,7 +2,7 @@ const { fetchData } = require('../services/apiService');
 
 async function importMatches(req, res) {
   try {
-    const matches = await fetchData('matches-endpoint'); // Replace with the correct endpoint
+    const matches = await fetchData('apiOne', 'matches-endpoint'); // Replace with the correct endpoint
     // Code to save matches to the database using SQL
     res.status(201).send('Matches imported successfully');
   } catch (error) {

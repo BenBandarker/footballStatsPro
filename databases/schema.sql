@@ -1,6 +1,8 @@
 CREATE TABLE Teams (
     team_id INT PRIMARY KEY AUTO_INCREMENT,
+    team_api_id INT PRIMARY KEY,
     team_name VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
     founded_year INT,
     stadium_name VARCHAR(100),
     manager_name VARCHAR(100)
@@ -8,6 +10,7 @@ CREATE TABLE Teams (
 
 CREATE TABLE Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
+    player_api_id INT PRIMARY KEY,
     player_name VARCHAR(100) NOT NULL,
     team_id INT,
     date_of_birth DATE,
@@ -18,6 +21,7 @@ CREATE TABLE Players (
 
 CREATE TABLE Tournaments (
     tournament_id INT PRIMARY KEY AUTO_INCREMENT,
+    tournament_api_id INT PRIMARY KEY,
     tournament_name VARCHAR(100) NOT NULL,
     start_date DATE,
     end_date DATE
@@ -27,6 +31,7 @@ CREATE TABLE Tournaments (
 
 CREATE TABLE MATCHES (
     match_id INT PRIMARY KEY AUTO_INCREMENT,
+    match_api_id INT PRIMARY KEY,
     home_team_id INT,
     away_team_id INT,
     tournament_id INT,

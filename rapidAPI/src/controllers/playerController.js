@@ -1,8 +1,9 @@
 const { fetchData } = require('../services/apiService');
 
-async function importPlayers(req, res) {
+async function importPlayersbyTeam(req, res) {
   try {
-    const players = await fetchData('players-endpoint'); // Replace with the correct endpoint
+    const { season, team_api_id } = req.params;
+    const players = await fetchData('apiOne',`v3/players?team=${team_api_id}&season=${season}`); // Replace with the correct endpoint
     // Code to save players to the database using SQL
     res.status(201).send('Players imported successfully');
   } catch (error) {
@@ -10,4 +11,15 @@ async function importPlayers(req, res) {
   }
 }
 
-module.exports = { importPlayers };
+async function importPlayersbyName(req, res) {
+    try {
+      const { name } = req.params;
+      const players = await fetchData('apiOne',`v3/players/profiles?search=${name}`); // Replace with the correct endpoint
+      // Code to save players to the database using SQL
+      res.status(201).send('Players imported successfully');
+    } catch (error) {
+      res.status(500).send('Error importing players');
+    }
+  }
+
+module.exports = { importPlayersbyTeam, importPlayersbyName };
