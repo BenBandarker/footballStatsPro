@@ -3,7 +3,7 @@ const { fetchData } = require('../services/apiService');
 async function importTeamsbyCountry(req, res) {
   try {
     const { country } = req.params;
-    const teams = await fetchData('apiOne',`teams?country=${country}`); // Replace with the correct endpoint
+    const teams = await fetchData('apiOne',`teams?country=${country}`); 
     // Code to save teams to the database using SQL
     res.status(201).send('Teams imported successfully');
   } catch (error) {
@@ -13,7 +13,7 @@ async function importTeamsbyCountry(req, res) {
 async function importTeamsbyName(req, res) {
     try {
       const { name } = req.params;
-      const teams = await fetchData('apiOne',`teams?name=${name}`); // Replace with the correct endpoint
+      const teams = await fetchData('apiOne',`teams?name=${name}`);
       // Code to save teams to the database using SQL
       res.status(201).send('Teams imported successfully');
     } catch (error) {
