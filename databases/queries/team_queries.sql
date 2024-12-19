@@ -2,8 +2,8 @@
 
 -- Insert a new team
 -- Arguments:
-INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name, manager_name) 
-    VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) 
+    VALUES (?, ?, ?, ?, ?);
 
 -- Insert team match stats
 -- Arguments: {match_id}, {team_id}, {possession_percent}, {shots}, {expected_goals}, {passes}, {tackles}, {tackles_won}, {fouls_committed}, {offsides}, {corners}, {free_kicks}, {penalty_kicks}, {yellow_cards}, {red_cards}
