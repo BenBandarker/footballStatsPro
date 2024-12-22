@@ -4,18 +4,16 @@ CREATE TABLE Teams (
     team_name VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     founded_year INT,
-    stadium_name VARCHAR(100),
+    stadium_name VARCHAR(100)
 );
 
 CREATE TABLE Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
     player_api_id INT,
     player_name VARCHAR(100) NOT NULL,
-    -- team_id INT,
     date_of_birth DATE,
     position VARCHAR(100),
-    nationality VARCHAR(50),
-    -- FOREIGN KEY (team_id) REFERENCES Teams(team_id)
+    nationality VARCHAR(50)
 );
 
 CREATE TABLE Tournaments (
@@ -70,8 +68,6 @@ CREATE TABLE Player_Performance (
     FOREIGN KEY (match_id) REFERENCES Matches(match_id)
 );
 
-
-
 CREATE TABLE Team_Match_Stats (
     stat_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
@@ -103,7 +99,6 @@ CREATE TABLE Player_Events (
     FOREIGN KEY (match_id) REFERENCES Matches(match_id),
     FOREIGN KEY (player_id) REFERENCES Players(player_id)
 );
-
 
 CREATE TABLE Team_Events (
     event_id INT PRIMARY KEY AUTO_INCREMENT,

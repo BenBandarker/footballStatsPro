@@ -8,9 +8,12 @@ const port = 3000;
 
 app.use(express.json());
 app.use('/tournaments', tournamentsRoutes);
-
-initializeDatabase().then(() => {
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+try{
+  initializeDatabase().then(() => {
+    app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });
   });
-});
+} catch (error) {
+  console.error('Error starting server:', error);
+}
