@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { apiOne, apiTwo } = require('../config/apiConfig');
+const { apiOne, apiTwo } = require('../../config/apiConfig');
 
 async function fetchData(apiName, endpoint) {
   const apiConfig = apiName === 'apiOne' ? apiOne : apiTwo;

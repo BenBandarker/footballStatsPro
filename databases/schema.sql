@@ -11,11 +11,11 @@ CREATE TABLE Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
     player_api_id INT,
     player_name VARCHAR(100) NOT NULL,
-    team_id INT,
+    -- team_id INT,
     date_of_birth DATE,
     position VARCHAR(100),
     nationality VARCHAR(50),
-    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
+    -- FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
 
 CREATE TABLE Tournaments (

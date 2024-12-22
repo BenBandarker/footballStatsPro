@@ -1,21 +1,16 @@
 const express = require('express');
-const { fetchData } = require('./services/apiService');
+const { initializeDatabase } = require('./initializeDatabase.js');
+const tournamentsRoutes = require('./routes/tournamentRoutes');
 require('dotenv').config();
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use('/tournaments', tournamentsRoutes);
 
-app.get('/data', async (req, res) => {
-  try {
-    const data = await fetchData('example-endpoint'); //have to replace 'example-endpoint' with the actual endpoint
-    res.json(data);
-  } catch (error) {
-    res.status(500).send('Error fetching data');
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+initializeDatabase().then(() => {
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
 });

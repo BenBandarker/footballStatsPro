@@ -1,4 +1,5 @@
 const { fetchData } = require('../services/apiService');
+const { executeQuery } = require('../services/databaseService');
 
 async function importTeamsbyCountry(req, res) {
   try {
