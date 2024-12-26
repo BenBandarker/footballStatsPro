@@ -1,4 +1,4 @@
-CREATE TABLE Teams (
+CREATE TABLE IF NOT EXISTS Teams (
     team_id INT PRIMARY KEY AUTO_INCREMENT,
     team_api_id INT,
     team_name VARCHAR(100) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE Teams (
     stadium_name VARCHAR(100)
 );
 
-CREATE TABLE Players (
+CREATE TABLE IF NOT EXISTS Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
     player_api_id INT,
     player_name VARCHAR(100) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE Players (
     nationality VARCHAR(50)
 );
 
-CREATE TABLE Tournaments (
+CREATE TABLE IF NOT EXISTS Tournaments (
     tournament_id INT PRIMARY KEY AUTO_INCREMENT,
     tournament_api_id INT,
     tournament_name VARCHAR(100) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE Tournaments (
     location VARCHAR(50)
 );
 
-CREATE TABLE Matches (
+CREATE TABLE IF NOT EXISTS Matches (
     match_id INT PRIMARY KEY AUTO_INCREMENT,
     match_api_id INT,
     home_team_id INT,
@@ -41,7 +41,7 @@ CREATE TABLE Matches (
     FOREIGN KEY (tournament_id) REFERENCES Tournaments(tournament_id)
 );
 
-CREATE TABLE Player_Performance (
+CREATE TABLE IF NOT EXISTS Player_Performance (
     performance_id INT PRIMARY KEY AUTO_INCREMENT,
     player_id INT NOT NULL,
     match_id INT NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE Player_Performance (
     FOREIGN KEY (match_id) REFERENCES Matches(match_id)
 );
 
-CREATE TABLE Team_Match_Stats (
+CREATE TABLE IF NOT EXISTS Team_Match_Stats (
     stat_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
     team_id INT NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE Team_Match_Stats (
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
 
-CREATE TABLE Player_Events (
+CREATE TABLE IF NOT EXISTS Player_Events (
     event_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
     player_id INT NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE Player_Events (
     FOREIGN KEY (player_id) REFERENCES Players(player_id)
 );
 
-CREATE TABLE Team_Events (
+CREATE TABLE IF NOT EXISTS Team_Events (
     event_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
     team_id INT NOT NULL,

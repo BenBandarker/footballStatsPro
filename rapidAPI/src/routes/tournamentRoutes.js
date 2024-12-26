@@ -4,4 +4,6 @@ const router = express.Router();
 
 router.post('/import', importTournaments);
 
+// router.get('/', getTournaments);
+
 module.exports = router;
