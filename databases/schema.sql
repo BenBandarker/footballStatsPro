@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS Teams (
     team_id INT PRIMARY KEY AUTO_INCREMENT,
-    team_api_id INT,
+    team_api_id INT UNIQUE,
     team_name VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     founded_year INT,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Teams (
 
 CREATE TABLE IF NOT EXISTS Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
-    player_api_id INT,
+    player_api_id INT UNIQUE,
     player_name VARCHAR(100) NOT NULL,
     date_of_birth DATE,
     position VARCHAR(100),
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Players (
 
 CREATE TABLE IF NOT EXISTS Tournaments (
     tournament_id INT PRIMARY KEY AUTO_INCREMENT,
-    tournament_api_id INT,
+    tournament_api_id INT UNIQUE,
     tournament_name VARCHAR(100) NOT NULL,
     start_date DATE,
     end_date DATE,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Tournaments (
 
 CREATE TABLE IF NOT EXISTS Matches (
     match_id INT PRIMARY KEY AUTO_INCREMENT,
-    match_api_id INT,
+    match_api_id INT UNIQUE,
     home_team_id INT,
     away_team_id INT,
     tournament_id INT,

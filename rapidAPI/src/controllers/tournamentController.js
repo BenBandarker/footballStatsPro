@@ -25,7 +25,7 @@ async function importTournaments(req, res) {
           tournament.seasons[tournament.seasons.length-1].end,
           tournament.country.name,
         ];
-        const insertQuery = `INSERT INTO Tournaments (tournament_api_id, tournament_name, start_date, end_date, year, location) VALUES (?, ?, ?, ?, ?, ?)`;
+        const insertQuery = `INSERT INTO Tournaments (tournament_api_id, tournament_name, start_date, end_date, location) VALUES (?, ?, ?, ?, ?)`;
 
         await executeQuery(insertQuery, params);
       }
