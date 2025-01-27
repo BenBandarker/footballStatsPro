@@ -23,4 +23,83 @@ async function executeQuery(query, params) {
   }
 }
 
-module.exports = { executeQuery };
+// Function to validate request parameters for the database
+function validateTournamentParamsDb(params) {
+  for (const [key, value] of Object.entries(params)) {
+    switch (key) {
+      case 'tournament_id':
+        id_value = parseInt(value);
+        if (!value || typeof id_value !== 'number') {
+          return { valid: false, message: 'Invalid tournament_id parameter' };
+        }
+        break;
+      case 'tournament_api_id':
+        id_api_value = parseInt(value);
+        if (!value || typeof id_api_value !== 'number') {
+          return { valid: false, message: 'Invalid tournament_api_id parameter' };
+        }
+        break;
+      case 'tournament_name':
+        if (!value || typeof value !== 'string') {
+          return { valid: false, message: 'Invalid tournament_name parameter' };
+        }
+        break;
+      case 'location':
+        if (!value || typeof value !== 'string') {
+          return { valid: false, message: 'Invalid location parameter' };
+        }
+        break;
+      default:
+        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
+    }
+  }
+
+  return { valid: true };
+}
+
+// Function to validate request parameters for the database
+function validateTeamsParamsDb(params) {
+  for (const [key, value] of Object.entries(params)) {
+    switch (key) {
+      case 'team_id':
+        id_value = parseInt(value);
+        if (!value || typeof id_value !== 'number') {
+          return { valid: false, message: 'Invalid tournament_id parameter' };
+        }
+        break;
+      case 'team_api_id':
+        id_api_value = parseInt(value);
+        if (!value || typeof id_api_value !== 'number') {
+          return { valid: false, message: 'Invalid tournament_api_id parameter' };
+        }
+        break;
+      case 'team_name':
+        if (!value || typeof value !== 'string') {
+          return { valid: false, message: 'Invalid tournament_name parameter' };
+        }
+        break;
+      case 'country':
+        if (!value || typeof value !== 'string') {
+          return { valid: false, message: 'Invalid location parameter' };
+        }
+        break;
+      case 'founded_year':
+        founded_value = parseInt(value);
+        if (!value || typeof founded_value !== 'number') {
+          return { valid: false, message: 'Invalid founded_year parameter' };
+        }
+        break;
+      case 'stadium_name':
+        if (!value || typeof value !== 'string') {
+          return { valid: false, message: 'Invalid stadium_name parameter' };
+        }
+      default:
+        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
+    }
+  }
+
+  return { valid: true };
+}
+
+
+module.exports = { executeQuery , validateTournamentParamsDb , validateTeamsParamsDb };

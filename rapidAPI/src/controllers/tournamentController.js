@@ -1,31 +1,5 @@
-const { fetchData } = require('../services/apiService');
-const { executeQuery } = require('../services/databaseService');
-
-// Function to validate request parameters
-function validateParams(params) {
-  const currentYear = new Date().getFullYear();
-
-  for (const [key, value] of Object.entries(params)) {
-    switch (key) {
-      case 'country':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid country parameter' };
-        }
-        break;
-
-      case 'season':
-        if (!value || typeof value !== 'number' || value < 2010 || value > currentYear) {
-          return { valid: false, message: 'Invalid season parameter. Make sure the season is between 2010 and the current year.' };
-        }
-        break;
-
-      default:
-        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
-    }
-  }
-
-  return { valid: true };
-}
+const { fetchData, validateTournamentParamsApi } = require('../services/apiService');
+const { executeQuery, validateTournamentParamsDb } = require('../services/databaseService');
 
 // Function to save a single tournament to the database
 async function saveTournamentToDatabase(tournament) {
@@ -42,21 +16,22 @@ async function saveTournamentToDatabase(tournament) {
   await executeQuery(insertQuery, params);
 }
 
-// Main function to import tournaments
+// Function to import tournaments
 async function importTournaments(req, res) {
   try {
-    const { country, season } = req.body;
+    const params = req.query;
 
     // Validate parameters
-    const validation = validateParams({ country, season });
+    const validation = validateTournamentParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
+  // Build query string for API call
+  const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    // Fetch tournaments from the API
-    const apiResponse = await fetchData('apiOne', `v3/leagues?country=${country}&season=${season}`);
-    const tournaments = apiResponse.response;
-
+  // Fetch tournaments from the API
+  const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
+  const tournaments = apiResponse.response;
     if (tournaments.length === 0) {
       return res.status(404).send('No tournaments found');
     }
@@ -73,4 +48,95 @@ async function importTournaments(req, res) {
   }
 }
 
-module.exports = { importTournaments };
+// Function to search for tournaments at the api service and return the result
+async function searchTournaments(req, res) {
+  try {
+    const params = req.query;
+
+    // Validate parameters
+    const validation = validateTournamentParams(params);
+    if (!validation.valid) {
+      return res.status(400).send(validation.message);
+    }
+  // Build query string for API call
+  const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+
+  // Fetch tournaments from the API
+  const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
+  const tournaments = apiResponse.response;
+    if (tournaments.length === 0) {
+      return res.status(404).send('No tournaments found');
+    }
+
+    res.status(200).send(tournaments);
+
+    res.status(201).send('Tournaments imported successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error importing tournaments');
+  }
+}
+
+// Function to get tournaments
+async function getTournamentsDb(req, res) {
+  try {
+    const params = req.query; // Get dynamic parameters from req.query
+    const validation = validateTournamentParamsDb(params);
+    if (!validation.valid) {
+      return res.status(400).send(validation.message);
+    }
+
+    const queryBase = 'SELECT * FROM Tournaments';
+    const queryConditions = [];
+    const queryParams = [];
+
+    // Build the WHERE clause dynamically
+    for (const [key, value] of Object.entries(params)) {
+      queryConditions.push(`${key} = ?`);                          
+      queryParams.push(value);
+    }
+
+    // Combine the base query with conditions if any
+    const query = queryConditions.length > 0 ? `${queryBase} WHERE ${queryConditions.join(' AND ')}` : queryBase;
+
+    const tournaments = await executeQuery(query, queryParams);
+
+    res.status(200).send(tournaments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error getting tournaments');
+  }
+}
+
+// Function to delete tournaments from the database
+async function deleteTournamentsDb(req, res) {
+  try {
+    const params = req.query;
+    const validation = validateTournamentParamsDb(params);
+    if (!validation.valid) {
+      return res.status(400).send(validation.message);
+    }
+    const queryConditions = [];
+    const queryParams = [];
+
+    // Build the WHERE clause dynamically
+    for (const [key, value] of Object.entries(params)) {
+      queryConditions.push(`${key} = ?`);                          
+      queryParams.push(value);
+    }
+
+    if(queryConditions.length === 0) {
+      return res.status(400).send('No parameters provided for deletion');
+    }
+
+    const deleteQuery = `DELETE FROM Tournaments WHERE ${queryConditions.join(' AND ')}`;
+    await executeQuery(deleteQuery, queryParams);
+
+    res.status(200).send('Tournament deleted successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error deleting tournament');
+  }
+}
+
+module.exports = { importTournaments, searchTournaments, getTournamentsDb, deleteTournamentsDb };
