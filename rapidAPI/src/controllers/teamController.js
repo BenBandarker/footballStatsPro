@@ -22,15 +22,25 @@ async function importTeams(req, res) {
     }
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    const teams = await fetchData('apiOne',`teams?${queryString}`); 
-    
+    const apiResponse = await fetchData('apiOne',`v3/teams?${queryString}`); 
+    const teams = apiResponse.response;
+
     if(teams.length === 0){
       res.status(404).send('No teams found');
     }
     else{
       for(const team of teams){
-        // Save tournament to the database
-        await saveTeamToDatabese(team);
+        try {
+          await saveTeamToDatabese(team); // Attempt to save the team
+        } catch (error) {
+          // Handle duplicate entry error and log the skipped team
+          if (error.code === 'ER_DUP_ENTRY') {
+            console.log(`Duplicate entry for team API-ID ${team.team.id}, skipping...`);
+          } else {
+            console.error(`Error saving team API-ID ${team.team.id}: ${error.message}`);
+            throw error; 
+          }
+        }
       }
       res.status(201).send('Teams imported successfully');
     }

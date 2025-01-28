@@ -38,7 +38,17 @@ async function importTournaments(req, res) {
 
     // Save tournaments to the database
     for (const tournament of tournaments) {
-      await saveTournamentToDatabase(tournament);
+      try {
+        await saveTournamentToDatabase(tournament); // Attempt to save the team
+      } catch (error) {
+        // Handle duplicate entry error and log the skipped team
+        if (error.code === 'ER_DUP_ENTRY') {
+          console.log(`Duplicate entry for tournament API-ID ${tournament.league.id}, skipping...`);
+        } else {
+          console.error(`Error saving tournament API_ID ${tournament.league.id}: ${error.message}`);
+          throw error; 
+        }
+      }
     }
 
     res.status(201).send('Tournaments imported successfully');
