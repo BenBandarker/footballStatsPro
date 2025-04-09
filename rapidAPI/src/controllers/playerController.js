@@ -1,4 +1,4 @@
-const { fetchData } = require('../services/apiService');
+const { fetchData } = require('../services/tournamentService');
 
 async function importPlayersbyTeam(req, res) {
   try {

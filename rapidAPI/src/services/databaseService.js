@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
@@ -23,83 +25,44 @@ async function executeQuery(query, params) {
   }
 }
 
-// Function to validate request parameters for the database
-function validateTournamentParamsDb(params) {
-  for (const [key, value] of Object.entries(params)) {
-    switch (key) {
-      case 'tournament_id':
-        id_value = parseInt(value);
-        if (!value || typeof id_value !== 'number') {
-          return { valid: false, message: 'Invalid tournament_id parameter' };
-        }
-        break;
-      case 'tournament_api_id':
-        id_api_value = parseInt(value);
-        if (!value || typeof id_api_value !== 'number') {
-          return { valid: false, message: 'Invalid tournament_api_id parameter' };
-        }
-        break;
-      case 'tournament_name':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid tournament_name parameter' };
-        }
-        break;
-      case 'location':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid location parameter' };
-        }
-        break;
-      default:
-        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
-    }
-  }
+async function createDatabaseIfNotExists() {
+  try {
+      const connection = await mysql.createConnection({
+          host: process.env.DB_HOST,
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+      });
 
-  return { valid: true };
+      // Create the database if it doesn't exist
+      await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+      console.log(`Database '${process.env.DB_NAME}' created or already exists.`);
+      connection.end();
+  } catch (error) {
+      console.error('Error creating database:', error);
+      throw error;
+  }
 }
 
-// Function to validate request parameters for the database
-function validateTeamsParamsDb(params) {
-  for (const [key, value] of Object.entries(params)) {
-    switch (key) {
-      case 'team_id':
-        id_value = parseInt(value);
-        if (!value || typeof id_value !== 'number') {
-          return { valid: false, message: 'Invalid tournament_id parameter' };
-        }
-        break;
-      case 'team_api_id':
-        id_api_value = parseInt(value);
-        if (!value || typeof id_api_value !== 'number') {
-          return { valid: false, message: 'Invalid tournament_api_id parameter' };
-        }
-        break;
-      case 'team_name':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid tournament_name parameter' };
-        }
-        break;
-      case 'country':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid location parameter' };
-        }
-        break;
-      case 'founded_year':
-        founded_value = parseInt(value);
-        if (!value || typeof founded_value !== 'number') {
-          return { valid: false, message: 'Invalid founded_year parameter' };
-        }
-        break;
-      case 'stadium_name':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid stadium_name parameter' };
-        }
-      default:
-        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
-    }
-  }
+async function initializeDatabase() {
+  try {
+    await createDatabaseIfNotExists();
 
-  return { valid: true };
+    const schemaPath = path.join(__dirname, '../../../databases/schema.sql');
+    const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
+
+    const queries = schemaSQL.split(/;\r?\n/).filter((query) => query.trim() !== '');
+    for (const query of queries) {
+      await executeQuery(query);
+    }
+
+    console.log('Database schema initialized successfully.');
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    throw error;
+  }
 }
 
-
-module.exports = { executeQuery , validateTournamentParamsDb , validateTeamsParamsDb };
+module.exports = { 
+  executeQuery,
+  initializeDatabase 
+};

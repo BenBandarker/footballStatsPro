@@ -1,5 +1,5 @@
-const { fetchData , validateTeamsParamsApi } = require('../services/apiService');
-const { executeQuery , validateTeamsParamsDb } = require('../services/databaseService');
+const { fetchData , validateTeamsParamsApi, validateTeamsParamsDb } = require('../services/teamService');
+const { executeQuery } = require('../services/databaseService');
 
 async function saveTeamToDatabese(team){
   const params = [team.team.id,

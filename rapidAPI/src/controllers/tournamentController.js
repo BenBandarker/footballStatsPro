@@ -1,7 +1,8 @@
-const { fetchData, validateTournamentParamsApi } = require('../services/apiService');
-const { executeQuery, validateTournamentParamsDb } = require('../services/databaseService');
+const { fetchData, validateTournamentParamsApi, validateTournamentParamsDb } = require('../services/tournamentService');
+const { executeQuery } = require('../services/databaseService');
 
-// Function to save a single tournament to the database
+// Saves a single tournament to the database by extracting key details:
+// league ID and name, latest season start/end dates, and country name.
 async function saveTournamentToDatabase(tournament) {
   const params = [
     tournament.league.id,
@@ -16,7 +17,9 @@ async function saveTournamentToDatabase(tournament) {
   await executeQuery(insertQuery, params);
 }
 
-// Function to import tournaments
+// Handles the tournament import process: validates query parameters,
+// fetches tournament data from an external API, and saves it to the database.
+// Returns appropriate responses based on success, empty results, or errors.
 async function importTournaments(req, res) {
   try {
     const params = req.query;
@@ -58,7 +61,9 @@ async function importTournaments(req, res) {
   }
 }
 
-// Function to search for tournaments at the api service and return the result
+// Searches for tournaments using API query parameters provided in the request.
+// Accepts query parameters such as country and season through `req.query`.
+// Returns a list of tournaments from the external API or an error message if none found.
 async function searchTournaments(req, res) {
   try {
     const params = req.query;
@@ -87,7 +92,9 @@ async function searchTournaments(req, res) {
   }
 }
 
-// Function to get tournaments
+// Retrieves tournaments from the database based on optional filtering criteria.
+// Accepts query parameters such as location or year through `req.query`.
+// Returns a filtered list of tournaments from the database or an error message.
 async function getTournamentsDb(req, res) {
   try {
     const params = req.query; // Get dynamic parameters from req.query
@@ -118,7 +125,9 @@ async function getTournamentsDb(req, res) {
   }
 }
 
-// Function to delete tournaments from the database
+// Deletes tournaments from the database based on specified filter criteria.
+// Accepts query parameters such as location or year through `req.query`.
+// Returns a success message if deletion is successful, or an error message otherwise.
 async function deleteTournamentsDb(req, res) {
   try {
     const params = req.query;
@@ -149,4 +158,58 @@ async function deleteTournamentsDb(req, res) {
   }
 }
 
-module.exports = { importTournaments, searchTournaments, getTournamentsDb, deleteTournamentsDb };
+// Updates tournament data in the database based on tournament_id or tournament_api_id.
+// Accepts query parameters for identifying the tournament and the fields to update.
+// Returns a success message if update is successful, or an error message otherwise.
+async function updateTournamentsDb(req, res) {
+  try {
+    const params = req.query;
+
+    const validation = validateTournamentParamsDb(params);
+    if (!validation.valid) {
+      return res.status(400).send(validation.message);
+    }
+
+    const { tournament_id, tournament_api_id, ...updateFields } = params;
+
+    if (!tournament_id && !tournament_api_id) {
+      return res.status(400).send('Missing tournament_id or tournament_api_id for WHERE clause');
+    }
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).send('No fields provided for update');
+    }
+
+    const setClauses = [];
+    const values = [];
+
+    for (const [key, value] of Object.entries(updateFields)) {
+      setClauses.push(`${key} = ?`);
+      values.push(value);
+    }
+
+    const whereClauses = [];
+    if (tournament_id) {
+      whereClauses.push('tournament_id = ?');
+      values.push(tournament_id);
+    }
+    if (tournament_api_id) {
+      whereClauses.push('tournament_api_id = ?');
+      values.push(tournament_api_id);
+    }
+
+    const updateQuery = `
+      UPDATE Tournaments
+      SET ${setClauses.join(', ')}
+      WHERE ${whereClauses.join(' AND ')}
+    `;
+
+    await executeQuery(updateQuery, values);
+    res.status(200).send('Tournament updated successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating tournament');
+  }
+}
+
+module.exports = { importTournaments, searchTournaments, getTournamentsDb, deleteTournamentsDb, updateTournamentsDb };

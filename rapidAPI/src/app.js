@@ -1,5 +1,5 @@
 const express = require('express');
-const { initializeDatabase } = require('./initializeDatabase.js');
+const { initializeDatabase } = require('./services/databaseService');
 const tournamentsRoutes = require('./routes/tournamentRoutes');
 const teamsRoutes = require('./routes/teamRoutes');
 require('dotenv').config();
