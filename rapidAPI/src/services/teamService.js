@@ -93,9 +93,11 @@ function validateTeamsParamsDb(params) {
           }
           break;
         case 'stadium_name':
-          if (!value || typeof value !== 'string') {
+          stadium = decodeURIComponent(value);
+          if (!stadium || typeof stadium !== 'string') {
             return { valid: false, message: 'Invalid stadium_name parameter' };
           }
+          break;
         default:
           return { valid: false, message: `Unknown or invalid parameter: ${key}` };
       }

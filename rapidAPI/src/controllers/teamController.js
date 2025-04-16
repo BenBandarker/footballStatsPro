@@ -1,12 +1,13 @@
 const { fetchData , validateTeamsParamsApi, validateTeamsParamsDb } = require('../services/teamService');
 const { executeQuery } = require('../services/databaseService');
+const { updateTournamentsDb } = require('./tournamentController');
 
-async function saveTeamToDatabese(team){
-  const params = [team.team.id,
-    team.team.name,
-    team.team.country,
-    team.team.founded,
-    team.venue.name,
+async function saveTeamToDatabese(team, venueName){
+  const params = [team.id,
+    team.name,
+    team.country,
+    team.founded,
+    venueName,
   ];
   const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) VALUES (?, ?, ?, ?, ?)`;
 
@@ -29,9 +30,9 @@ async function importTeams(req, res) {
       res.status(404).send('No teams found');
     }
     else{
-      for(const team of teams){
+      for(const { team, venue } of teams){
         try {
-          await saveTeamToDatabese(team); // Attempt to save the team
+          await saveTeamToDatabese(team, venue.name); // Attempt to save the team
         } catch (error) {
           // Handle duplicate entry error and log the skipped team
           if (error.code === 'ER_DUP_ENTRY') {
@@ -58,8 +59,8 @@ async function searchTeams(req, res) {
     }
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    const teams = await fetchData('apiOne',`teams?${queryString}`); 
-    
+    const apiResponse = await fetchData('apiOne',`v3/teams?${queryString}`); 
+    const teams = apiResponse.response
     if(teams.length === 0){
       res.status(404).send('No teams found');
     }
@@ -86,7 +87,7 @@ async function getTeamDb(req, res) {
     // Build the WHERE clause dynamically
     for (const [key, value] of Object.entries(params)) {
       queryConditions.push(`${key} = ?`);                          
-      queryParams.push(value);
+      queryParams.push(decodeURIComponent(value)); // decodeURIComponent needed to handle values with spaces
     }
 
     // Combine the base query with conditions if any
@@ -113,7 +114,7 @@ async function deleteTeamsDb(req, res) {
 
     for (const [key, value] of Object.entries(params)) {
       queryConditions.push(`${key} = ?`);
-      queryParams.push(value);
+      queryParams.push(decodeURIComponent(value)); // decodeURIComponent needed to handle values with spaces 
     }
 
     if(queryConditions.length === 0) {
@@ -124,10 +125,58 @@ async function deleteTeamsDb(req, res) {
     await executeQuery(query, queryParams);
 
     res.status(200).send('Teams deleted successfully');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error deleting teams');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error deleting teams');
+    }
   }
+  
+
+  async function updateTeamsDb(req, res) {
+    try{
+      const params = req.query;
+      const validation = validateTeamsParamsDb(params);
+      if(!validation.valid){
+        return res.status(400).send(validation.message);
+      }
+
+      const { team_id, team_api_id, ...updateFields} = params;
+      if( !team_id && !team_api_id){
+        return res.status(400).send('No fields provided for Where clause');
+      }
+
+      if(Object.keys(updateFields).length === 0){
+        return res.status(400).send('No fields provided for update');
+      }
+
+      const setClauses = [];
+      const values = [];
+      for( const [key, value] of Object.entries(updateFields)) {
+        setClauses.push(`${key} = ?`);
+        values.push(decodeURIComponent(value)); // decodeURIComponent needed to handle values with spaces
+      }
+
+      const whereClauses = [];
+      if(team_id) {
+        whereClauses.push('team_id = ?');
+        values.push(team_id);
+      }
+      if(team_api_id){
+        whereClauses.push('team_api_id = ?');
+        values.push(team_api_id);
+      }
+
+      const updateQuery = `
+      UPDATE Teams
+      SET ${setClauses.join(', ')}
+      where ${whereClauses.join(' AND ')}
+      `;
+      await executeQuery(updateQuery, values);
+      res.status(200).send('Team updated successfully');
+    } catch (error){
+      console.error(error);
+      res.status(400).send('Error updating team');
+    }
 }
 
-module.exports = { importTeams, searchTeams, getTeamDb, deleteTeamsDb };
+module.exports = { importTeams, searchTeams, getTeamDb, deleteTeamsDb , updateTeamsDb };

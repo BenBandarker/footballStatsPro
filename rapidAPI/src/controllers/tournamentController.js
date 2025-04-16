@@ -69,7 +69,7 @@ async function searchTournaments(req, res) {
     const params = req.query;
 
     // Validate parameters
-    const validation = validateTournamentParams(params);
+    const validation = validateTournamentParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
@@ -80,12 +80,10 @@ async function searchTournaments(req, res) {
   const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
   const tournaments = apiResponse.response;
     if (tournaments.length === 0) {
-      return res.status(404).send('No tournaments found');
+      return res.status(400).send('No tournaments found');
     }
 
     res.status(200).send(tournaments);
-
-    res.status(201).send('Tournaments imported successfully');
   } catch (error) {
     console.error(error);
     res.status(500).send('Error importing tournaments');
@@ -208,7 +206,7 @@ async function updateTournamentsDb(req, res) {
     res.status(200).send('Tournament updated successfully');
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error updating tournament');
+    res.status(400).send('Error updating tournament');
   }
 }
 
