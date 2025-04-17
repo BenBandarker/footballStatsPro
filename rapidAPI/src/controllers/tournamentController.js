@@ -1,21 +1,5 @@
-const { fetchData, validateTournamentParamsApi, validateTournamentParamsDb } = require('../services/tournamentService');
+const { fetchData, saveTournamentToDatabase, validateTournamentParamsApi, validateTournamentParamsDb } = require('../services/tournamentService');
 const { executeQuery } = require('../services/databaseService');
-
-// Saves a single tournament to the database by extracting key details:
-// league ID and name, latest season start/end dates, and country name.
-async function saveTournamentToDatabase(tournament) {
-  const params = [
-    tournament.league.id,
-    tournament.league.name,
-    tournament.seasons[tournament.seasons.length - 1].start,
-    tournament.seasons[tournament.seasons.length - 1].end,
-    tournament.country.name,
-  ];
-
-  const insertQuery = `INSERT INTO Tournaments (tournament_api_id, tournament_name, start_date, end_date, location) VALUES (?, ?, ?, ?, ?)`;
-
-  await executeQuery(insertQuery, params);
-}
 
 // Handles the tournament import process: validates query parameters,
 // fetches tournament data from an external API, and saves it to the database.
@@ -108,7 +92,7 @@ async function getTournamentsDb(req, res) {
     // Build the WHERE clause dynamically
     for (const [key, value] of Object.entries(params)) {
       queryConditions.push(`${key} = ?`);                          
-      queryParams.push(value);
+      queryParams.push(decodeURIComponent(value));
     }
 
     // Combine the base query with conditions if any
@@ -139,7 +123,7 @@ async function deleteTournamentsDb(req, res) {
     // Build the WHERE clause dynamically
     for (const [key, value] of Object.entries(params)) {
       queryConditions.push(`${key} = ?`);                          
-      queryParams.push(value);
+      queryParams.push(decodeURIComponent(value));
     }
 
     if(queryConditions.length === 0) {
@@ -183,7 +167,7 @@ async function updateTournamentsDb(req, res) {
 
     for (const [key, value] of Object.entries(updateFields)) {
       setClauses.push(`${key} = ?`);
-      values.push(value);
+      values.push(decodeURIComponent(value));
     }
 
     const whereClauses = [];

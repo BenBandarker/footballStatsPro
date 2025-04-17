@@ -14,16 +14,17 @@ async function fetchData(apiName, endpoint) {
   }
 }
 
-async function saveTeamToDatabase(team, venueName){
-  const params = [team.id,
-    team.name,
-    team.country,
-    team.founded,
-    venueName,
-  ];
-  const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) VALUES (?, ?, ?, ?, ?)`;
-
-  await executeQuery(insertQuery, params);
+async function savePlayerToDatabase(player) {
+    const params = [player.id,
+        player.player.name,
+        player.player.birth.date,
+        player.player.position,
+        player.player.nationality,];
+       
+        const insertQuery = `INSERT INTO Players (player_api_id, player_name, date_of_birth, position, nationality) VALUES (?, ?, ?, ?, ?)`;
+      
+        await executeQuery(insertQuery, params);
+    
 }
 
 // Function to validate request parameters for the API
@@ -38,8 +39,9 @@ function validateTeamsParamsApi(params) {
           return { valid: false, message: 'Invalid id parameter' };
         }
         break;
-      case 'name':
-        if (!value || typeof value !== 'string') {
+      case 'team':
+        team_value = parseInt(value)
+        if (!team_value || typeof team_value !== 'string') {
           return { valid: false, message: 'Invalid name parameter' };
         }
         break;
@@ -119,4 +121,4 @@ function validateTeamsParamsDb(params) {
     return { valid: true };
   }
 
-module.exports = { fetchData, saveTeamToDatabase, validateTeamsParamsApi, validateTeamsParamsDb };
+module.exports = { fetchData, validateTeamsParamsApi, validateTeamsParamsDb };

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { apiOne, apiTwo } = require('../../config/apiConfig');
+const { executeQuery } = require('../services/databaseService');
 
 async function fetchData(apiName, endpoint) {
   const apiConfig = apiName === 'apiOne' ? apiOne : apiTwo;
@@ -11,6 +12,22 @@ async function fetchData(apiName, endpoint) {
     console.error(`Error fetching data from ${apiName}:`, error);
     throw new Error(error);
   }
+}
+
+// Saves a single tournament to the database by extracting key details:
+// league ID and name, latest season start/end dates, and country name.
+async function saveTournamentToDatabase(tournament) {
+  const params = [
+    tournament.league.id,
+    tournament.league.name,
+    tournament.seasons[tournament.seasons.length - 1].start,
+    tournament.seasons[tournament.seasons.length - 1].end,
+    tournament.country.name,
+  ];
+
+  const insertQuery = `INSERT INTO Tournaments (tournament_api_id, tournament_name, start_date, end_date, location) VALUES (?, ?, ?, ?, ?)`;
+
+  await executeQuery(insertQuery, params);
 }
 
 // Function to validate request parameters for the API
@@ -98,4 +115,4 @@ function validateTournamentParamsDb(params) {
   return { valid: true };
 }
 
-module.exports = { fetchData, validateTournamentParamsApi, validateTournamentParamsDb };
+module.exports = { fetchData, saveTournamentToDatabase, validateTournamentParamsApi, validateTournamentParamsDb };

@@ -1,18 +1,5 @@
-const { fetchData , validateTeamsParamsApi, validateTeamsParamsDb } = require('../services/teamService');
+const { fetchData, saveTeamToDatabase, validateTeamsParamsApi, validateTeamsParamsDb } = require('../services/teamService');
 const { executeQuery } = require('../services/databaseService');
-const { updateTournamentsDb } = require('./tournamentController');
-
-async function saveTeamToDatabese(team, venueName){
-  const params = [team.id,
-    team.name,
-    team.country,
-    team.founded,
-    venueName,
-  ];
-  const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) VALUES (?, ?, ?, ?, ?)`;
-
-  await executeQuery(insertQuery, params);
-}
 
 async function importTeams(req, res) {
   try {
@@ -32,7 +19,7 @@ async function importTeams(req, res) {
     else{
       for(const { team, venue } of teams){
         try {
-          await saveTeamToDatabese(team, venue.name); // Attempt to save the team
+          await saveTeamToDatabase(team, venue.name); // Attempt to save the team
         } catch (error) {
           // Handle duplicate entry error and log the skipped team
           if (error.code === 'ER_DUP_ENTRY') {

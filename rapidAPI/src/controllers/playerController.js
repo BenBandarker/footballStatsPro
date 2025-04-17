@@ -1,4 +1,9 @@
-const { fetchData } = require('../services/tournamentService');
+const { fetchData, validateTeamsParamsApi } = require('../services/playerService');
+const { executeQuery } = require('../services/databaseService');
+
+async function name(params) {
+  
+}
 
 async function importPlayersbyTeam(req, res) {
   try {
