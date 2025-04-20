@@ -1,5 +1,4 @@
-const { fetchData, saveTournamentToDatabase, validateTournamentParamsApi, validateTournamentParamsDb } = require('../services/tournamentService');
-const { executeQuery } = require('../services/databaseService');
+const tournamentService = require('../services/tournamentService');
 
 // Handles the tournament import process: validates query parameters,
 // fetches tournament data from an external API, and saves it to the database.
@@ -9,7 +8,7 @@ async function importTournaments(req, res) {
     const params = req.query;
 
     // Validate parameters
-    const validation = validateTournamentParamsApi(params);
+    const validation = tournamentService.validateTournamentParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
@@ -26,7 +25,7 @@ async function importTournaments(req, res) {
     // Save tournaments to the database
     for (const tournament of tournaments) {
       try {
-        await saveTournamentToDatabase(tournament); // Attempt to save the team
+        await tournamentService.saveTournamentToDatabase(tournament); // Attempt to save the team
       } catch (error) {
         // Handle duplicate entry error and log the skipped team
         if (error.code === 'ER_DUP_ENTRY') {
@@ -53,7 +52,7 @@ async function searchTournaments(req, res) {
     const params = req.query;
 
     // Validate parameters
-    const validation = validateTournamentParamsApi(params);
+    const validation = tournamentService.validateTournamentParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
@@ -80,26 +79,12 @@ async function searchTournaments(req, res) {
 async function getTournamentsDb(req, res) {
   try {
     const params = req.query; // Get dynamic parameters from req.query
-    const validation = validateTournamentParamsDb(params);
+    const validation = tournamentService.validateTournamentParamsDb(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
 
-    const queryBase = 'SELECT * FROM Tournaments';
-    const queryConditions = [];
-    const queryParams = [];
-
-    // Build the WHERE clause dynamically
-    for (const [key, value] of Object.entries(params)) {
-      queryConditions.push(`${key} = ?`);                          
-      queryParams.push(decodeURIComponent(value));
-    }
-
-    // Combine the base query with conditions if any
-    const query = queryConditions.length > 0 ? `${queryBase} WHERE ${queryConditions.join(' AND ')}` : queryBase;
-
-    const tournaments = await executeQuery(query, queryParams);
-
+    const tournaments = await tournamentService.getTournamentsFromDb(params);
     res.status(200).send(tournaments);
   } catch (error) {
     console.error(error);
@@ -113,26 +98,12 @@ async function getTournamentsDb(req, res) {
 async function deleteTournamentsDb(req, res) {
   try {
     const params = req.query;
-    const validation = validateTournamentParamsDb(params);
+    const validation = tournamentService.validateTournamentParamsDb(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
-    const queryConditions = [];
-    const queryParams = [];
-
-    // Build the WHERE clause dynamically
-    for (const [key, value] of Object.entries(params)) {
-      queryConditions.push(`${key} = ?`);                          
-      queryParams.push(decodeURIComponent(value));
-    }
-
-    if(queryConditions.length === 0) {
-      return res.status(400).send('No parameters provided for deletion');
-    }
-
-    const deleteQuery = `DELETE FROM Tournaments WHERE ${queryConditions.join(' AND ')}`;
-    await executeQuery(deleteQuery, queryParams);
-
+    
+    await tournamentService.deleteTournamentsFromDb(params);
     res.status(200).send('Tournament deleted successfully');
   } catch (error) {
     console.error(error);
@@ -147,7 +118,7 @@ async function updateTournamentsDb(req, res) {
   try {
     const params = req.query;
 
-    const validation = validateTournamentParamsDb(params);
+    const validation = tournamentService.validateTournamentParamsDb(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
@@ -162,31 +133,7 @@ async function updateTournamentsDb(req, res) {
       return res.status(400).send('No fields provided for update');
     }
 
-    const setClauses = [];
-    const values = [];
-
-    for (const [key, value] of Object.entries(updateFields)) {
-      setClauses.push(`${key} = ?`);
-      values.push(decodeURIComponent(value));
-    }
-
-    const whereClauses = [];
-    if (tournament_id) {
-      whereClauses.push('tournament_id = ?');
-      values.push(tournament_id);
-    }
-    if (tournament_api_id) {
-      whereClauses.push('tournament_api_id = ?');
-      values.push(tournament_api_id);
-    }
-
-    const updateQuery = `
-      UPDATE Tournaments
-      SET ${setClauses.join(', ')}
-      WHERE ${whereClauses.join(' AND ')}
-    `;
-
-    await executeQuery(updateQuery, values);
+    await tournamentService.updateTournamentsInDb({ tournament_id, tournament_api_id }, updateFields);
     res.status(200).send('Tournament updated successfully');
   } catch (error) {
     console.error(error);

@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { apiOne, apiTwo } = require('../../config/apiConfig');
-const { executeQuery } = require('../services/databaseService');
+const Team = require('../models/teamModel');
 
 async function fetchData(apiName, endpoint) {
   const apiConfig = apiName === 'apiOne' ? apiOne : apiTwo;
@@ -21,9 +21,20 @@ async function saveTeamToDatabase(team, venueName){
     team.founded,
     venueName,
   ];
-  const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) VALUES (?, ?, ?, ?, ?)`;
+  
+  await Team.insertTeam(params);
+}
 
-  await executeQuery(insertQuery, params);
+async function getTeamsFromDb(filters) {
+  return await Team.findTeamsByFilters(filters);
+}
+
+async function deleteTeamsFromDb(filters) {
+  return await Team.deleteTeams(filters);
+}
+
+async function updateTeamssInDb(identifiers, updateFields) {
+  return await Team.updateTeams(identifiers, updateFields);
 }
 
 // Function to validate request parameters for the API
@@ -119,4 +130,12 @@ function validateTeamsParamsDb(params) {
     return { valid: true };
   }
 
-module.exports = { fetchData, saveTeamToDatabase, validateTeamsParamsApi, validateTeamsParamsDb };
+module.exports = { 
+  fetchData, 
+  saveTeamToDatabase, 
+  getTeamsFromDb,
+  deleteTeamsFromDb,
+  updateTeamssInDb,
+  validateTeamsParamsApi,
+  validateTeamsParamsDb 
+};

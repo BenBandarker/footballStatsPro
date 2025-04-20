@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { apiOne, apiTwo } = require('../../config/apiConfig');
-const { executeQuery } = require('../services/databaseService');
+const Tournament = require('../models/tournamentModel');
 
 async function fetchData(apiName, endpoint) {
   const apiConfig = apiName === 'apiOne' ? apiOne : apiTwo;
@@ -25,9 +25,19 @@ async function saveTournamentToDatabase(tournament) {
     tournament.country.name,
   ];
 
-  const insertQuery = `INSERT INTO Tournaments (tournament_api_id, tournament_name, start_date, end_date, location) VALUES (?, ?, ?, ?, ?)`;
+  await Tournament.insertTournament(params);
+}
 
-  await executeQuery(insertQuery, params);
+async function getTournamentsFromDb(filters) {
+  return await Tournament.findTournamentsByFilters(filters);
+}
+
+async function deleteTournamentsFromDb(filters) {
+  return await Tournament.deleteTournaments(filters);
+}
+
+async function updateTournamentsInDb(identifiers, updateFields) {
+  return await Tournament.updateTournaments(identifiers, updateFields);
 }
 
 // Function to validate request parameters for the API
@@ -115,4 +125,12 @@ function validateTournamentParamsDb(params) {
   return { valid: true };
 }
 
-module.exports = { fetchData, saveTournamentToDatabase, validateTournamentParamsApi, validateTournamentParamsDb };
+module.exports = {
+  fetchData,
+  saveTournamentToDatabase,
+  getTournamentsFromDb,
+  deleteTournamentsFromDb,
+  updateTournamentsInDb,
+  validateTournamentParamsApi,
+  validateTournamentParamsDb
+};
