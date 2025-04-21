@@ -10,10 +10,13 @@ CREATE TABLE IF NOT EXISTS Teams (
 CREATE TABLE IF NOT EXISTS Players (
     player_id INT PRIMARY KEY AUTO_INCREMENT,
     player_api_id INT UNIQUE,
-    player_name VARCHAR(100) NOT NULL,
+    player_Fname VARCHAR(100) NOT NULL,
+    player_Lname VARCHAR(100) NOT NULL,
     date_of_birth DATE,
-    position VARCHAR(100),
-    nationality VARCHAR(50)
+    nationality VARCHAR(50),
+    height INT,
+    weight INT,
+    photo_url VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Tournaments (

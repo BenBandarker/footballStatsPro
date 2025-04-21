@@ -102,8 +102,11 @@ async function deleteTournamentsDb(req, res) {
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
+    const result = await tournamentService.deleteTournamentsFromDb(params);
+    if (result.affectedRows === 0) {
+      return res.status(404).send('No players found to delete');
+    }
     
-    await tournamentService.deleteTournamentsFromDb(params);
     res.status(200).send('Tournament deleted successfully');
   } catch (error) {
     console.error(error);

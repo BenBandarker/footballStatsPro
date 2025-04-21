@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { apiOne, apiTwo } = require('../../config/apiConfig');
-const { executeQuery } = require('../services/databaseService');
+const Player = require('../models/playerModel');
 
 async function fetchData(apiName, endpoint) {
   const apiConfig = apiName === 'apiOne' ? apiOne : apiTwo;
@@ -15,20 +15,33 @@ async function fetchData(apiName, endpoint) {
 }
 
 async function savePlayerToDatabase(player) {
-    const params = [player.id,
-        player.player.name,
-        player.player.birth.date,
-        player.player.position,
-        player.player.nationality,];
+  const params = [player.id,
+    player.player.firstname,
+    player.player.lastname,
+    player.player.birth.date,
+    player.player.nationality,
+    player.player.height,
+    player.player.weight,
+    player.player.photo,];
        
-        const insertQuery = `INSERT INTO Players (player_api_id, player_name, date_of_birth, position, nationality) VALUES (?, ?, ?, ?, ?)`;
-      
-        await executeQuery(insertQuery, params);
+  await Player.insertPlayer(params);
     
 }
 
+async function getPlayersFromDb(filters) {
+  return await Player.findPlayersByFilters(filters); 
+}
+
+async function deletePlayersFromDb(filters) {
+  return await Player.deletePlayers(filters);
+}
+
+async function updatePlayersInDb(identifiers, updateFields) {
+  return await Player.updatePlayers(identifiers, updateFields);
+}
+
 // Function to validate request parameters for the API
-function validateTeamsParamsApi(params) {
+function validatePlayersParamsApi(params) {
   const currentYear = new Date().getFullYear();
 
   for (const [key, value] of Object.entries(params)) {
@@ -41,7 +54,7 @@ function validateTeamsParamsApi(params) {
         break;
       case 'team':
         team_value = parseInt(value)
-        if (!team_value || typeof team_value !== 'string') {
+        if (!team_value || typeof team_value !== 'number') {
           return { valid: false, message: 'Invalid name parameter' };
         }
         break;
@@ -55,11 +68,6 @@ function validateTeamsParamsApi(params) {
         num_value = parseInt(value);
         if (!num_value || typeof num_value !== 'number' || num_value < 2010 || num_value > currentYear) {
           return { valid: false, message: 'Invalid season parameter. Make sure the season is between 2010 and the current year.' };
-        }
-        break;
-      case 'country':
-        if (!value || typeof value !== 'string') {
-          return { valid: false, message: 'Invalid country parameter' };
         }
         break;
       case 'search': 
@@ -76,41 +84,61 @@ function validateTeamsParamsApi(params) {
 }
 
 // Function to validate request parameters for the database
-function validateTeamsParamsDb(params) {
+function validatePlayersParamsDb(params) {
     for (const [key, value] of Object.entries(params)) {
       switch (key) {
-        case 'team_id':
+        case 'player_id':
           id_value = parseInt(value);
           if (!value || typeof id_value !== 'number') {
-            return { valid: false, message: 'Invalid tournament_id parameter' };
+            return { valid: false, message: 'Invalid player_id parameter' };
           }
           break;
-        case 'team_api_id':
+        case 'player_api_id':
           id_api_value = parseInt(value);
           if (!value || typeof id_api_value !== 'number') {
-            return { valid: false, message: 'Invalid tournament_api_id parameter' };
+            return { valid: false, message: 'Invalid player_api_id parameter' };
           }
           break;
-        case 'team_name':
+        case 'player_Fname':
           if (!value || typeof value !== 'string') {
-            return { valid: false, message: 'Invalid tournament_name parameter' };
+            return { valid: false, message: 'Invalid player first name parameter' };
           }
           break;
-        case 'country':
+        case 'player_Lname':
           if (!value || typeof value !== 'string') {
-            return { valid: false, message: 'Invalid location parameter' };
+            return { valid: false, message: 'Invalid player last name parameter' };
           }
           break;
-        case 'founded_year':
-          founded_value = parseInt(value);
-          if (!value || typeof founded_value !== 'number') {
-            return { valid: false, message: 'Invalid founded_year parameter' };
+          case 'date_of_birth':
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!value || typeof value !== 'string' || !dateRegex.test(value)) {
+              return { valid: false, message: 'Invalid date_of_birth format. Expected format: YYYY-MM-DD' };
+            }
+            const date = new Date(value);
+            if (isNaN(date.getTime())) {
+              return { valid: false, message: 'Invalid date_of_birth value. Not a real date.' };
+            }
+            break;
+        case 'nationality':
+          if (!value || typeof value !== 'string') {
+            return { valid: false, message: 'Invalid nationality parameter' };
           }
           break;
-        case 'stadium_name':
-          stadium = decodeURIComponent(value);
-          if (!stadium || typeof stadium !== 'string') {
-            return { valid: false, message: 'Invalid stadium_name parameter' };
+        case 'height':
+          height_value = parseInt(value);
+          if (!value || typeof height_value !== 'number') {
+            return { valid: false, message: 'Invalid height parameter' };
+          }
+          break;
+        case 'weight':
+          weight_value = parseInt(value);
+          if (!value || typeof weight_value !== 'number') {
+            return { valid: false, message: 'Invalid weight parameter' };
+          }
+          break;
+        case 'photo_url':
+          if (!value || typeof value !== 'string') {
+            return { valid: false, message: 'Invalid photo_url parameter' };
           }
           break;
         default:
@@ -121,4 +149,12 @@ function validateTeamsParamsDb(params) {
     return { valid: true };
   }
 
-module.exports = { fetchData, validateTeamsParamsApi, validateTeamsParamsDb };
+module.exports = {
+  fetchData,
+  savePlayerToDatabase,
+  getPlayersFromDb,
+  deletePlayersFromDb,
+  updatePlayersInDb,
+  validatePlayersParamsApi,
+  validatePlayersParamsDb
+};
