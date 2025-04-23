@@ -10,7 +10,7 @@ async function deleteTeams(filters) {
     const queryConditions = [];
     const queryParams = [];
 
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of Object.entries(filters)) {
       queryConditions.push(`${key} = ?`);
       queryParams.push(decodeURIComponent(value)); // decodeURIComponent needed to handle values with spaces 
     }
@@ -61,7 +61,7 @@ async function findTeamsByFilters(filters) {
     const queryParams = [];
 
     // Build the WHERE clause dynamically
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of Object.entries(filters)) {
       queryConditions.push(`${key} = ?`);                          
       queryParams.push(decodeURIComponent(value)); // decodeURIComponent needed to handle values with spaces
     }

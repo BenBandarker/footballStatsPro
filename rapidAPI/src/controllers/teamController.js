@@ -9,7 +9,7 @@ async function importTeams(req, res) {
     }
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    const apiResponse = await fetchData('apiOne',`v3/teams?${queryString}`); 
+    const apiResponse = await teamService.fetchData('apiOne',`v3/teams?${queryString}`); 
     const teams = apiResponse.response;
 
     if(teams.length === 0){
@@ -32,6 +32,7 @@ async function importTeams(req, res) {
       res.status(201).send('Teams imported successfully');
     }
   } catch (error) {
+    console.error('Failed to import teams:', error);
     res.status(500).send('Error importing teams');
   }
 }
@@ -45,7 +46,7 @@ async function searchTeams(req, res) {
     }
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    const apiResponse = await fetchData('apiOne',`v3/teams?${queryString}`); 
+    const apiResponse = await teamService.fetchData('apiOne',`v3/teams?${queryString}`); 
     const teams = apiResponse.response
     if(teams.length === 0){
       res.status(404).send('No teams found');
@@ -77,7 +78,7 @@ async function getTeamDb(req, res) {
 async function deleteTeamsDb(req, res) {
   try {
     const params = req.query;
-    const validation = validateTeamsParamsDb(params);
+    const validation = teamService.validateTeamsParamsDb(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
@@ -94,7 +95,7 @@ async function deleteTeamsDb(req, res) {
   async function updateTeamsDb(req, res) {
     try{
       const params = req.query;
-      const validation = validateTeamsParamsDb(params);
+      const validation = teamService.validateTeamsParamsDb(params);
       if(!validation.valid){
         return res.status(400).send(validation.message);
       }

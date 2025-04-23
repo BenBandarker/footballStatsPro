@@ -5,14 +5,14 @@ async function importPlayers(req, res) {
   try {
     const params = req.query;
     // Validate parameters
-    const validation = playerService.validatePlayerParamsApi(params);
+    const validation = playerService.validatePlayersParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
     // Build query string for API call
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
     // Fetch players from the API
-    const apiResponse = await fetchData('apiOne', `v3/players?${queryString}`);
+    const apiResponse = await playerService.fetchData('apiOne', `v3/players?${queryString}`);
     const players = apiResponse.response;
     if (players.length === 0) {
       return res.status(404).send('No players found');
@@ -42,14 +42,14 @@ async function searchPlayers(req, res) {
   try {
     const params = req.query;
     // Validate parameters
-    const validation = playerService.validatePlayerParamsApi(params);
+    const validation = playerService.validatePlayersParamsApi(params);
     if (!validation.valid) {
       return res.status(400).send(validation.message);
     }
     // Build query string for API call
     const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
     // Fetch players from the API
-    const apiResponse = await fetchData('apiOne', `v3/players?${queryString}`);
+    const apiResponse = await playerService.fetchData('apiOne', `v3/players?${queryString}`);
     const players = apiResponse.response;
     if (players.length === 0) {
       return res.status(404).send('No players found');

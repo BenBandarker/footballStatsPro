@@ -16,7 +16,7 @@ async function importTournaments(req, res) {
   const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
   // Fetch tournaments from the API
-  const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
+  const apiResponse = await tournamentService.fetchData('apiOne', `v3/leagues?${queryString}`);
   const tournaments = apiResponse.response;
     if (tournaments.length === 0) {
       return res.status(404).send('No tournaments found');
@@ -60,7 +60,7 @@ async function searchTournaments(req, res) {
   const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
   // Fetch tournaments from the API
-  const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
+  const apiResponse = await tournamentService.fetchData('apiOne', `v3/leagues?${queryString}`);
   const tournaments = apiResponse.response;
     if (tournaments.length === 0) {
       return res.status(400).send('No tournaments found');

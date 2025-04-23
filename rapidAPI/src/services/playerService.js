@@ -14,17 +14,27 @@ async function fetchData(apiName, endpoint) {
   }
 }
 
+function sanitizeParams(params) {
+  return params.map(value => value === undefined ? null : value);
+}
+
+function parseNumericField(value) {
+  if (!value) return null;
+  const parsed = parseFloat(value.toString().replace(/[^\d.]/g, ''));
+  return isNaN(parsed) ? null : parsed;
+}
+
 async function savePlayerToDatabase(player) {
-  const params = [player.id,
+  const params = [player.player.id,
     player.player.firstname,
     player.player.lastname,
     player.player.birth.date,
     player.player.nationality,
-    player.player.height,
-    player.player.weight,
+    parseNumericField(player.player.height),
+    parseNumericField(player.player.weight),
     player.player.photo,];
        
-  await Player.insertPlayer(params);
+  await Player.insertPlayer(sanitizeParams(params));
     
 }
 

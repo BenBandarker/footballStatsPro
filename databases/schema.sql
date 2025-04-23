@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS Matches (
     tournament_id INT,
     match_date DATE,
     match_time TIME,
-    match_status ENUM('Scheduled', 'Playing', 'Played', 'Postponed'),
+    match_status ENUM('Scheduled', 'Playing', 'Finished', 'Postponed'),
     home_team_score INT,
     away_team_score INT,
     FOREIGN KEY (home_team_id) REFERENCES Teams(team_id),
@@ -90,17 +90,6 @@ CREATE TABLE IF NOT EXISTS Team_Match_Stats (
     red_cards INT DEFAULT 0,
     FOREIGN KEY (match_id) REFERENCES Matches(match_id),
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
-);
-
-CREATE TABLE IF NOT EXISTS Player_Events (
-    event_id INT PRIMARY KEY AUTO_INCREMENT,
-    match_id INT NOT NULL,
-    player_id INT NOT NULL,
-    event_type ENUM('Goal', 'Assist', 'Foul', 'Yellow Card', 'Red Card', 
-                    'Shot', 'Save', 'Miss', 'Interception', 'Clearance',  'Injury', 'Substitution'),
-    event_time INT NOT NULL,
-    FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (player_id) REFERENCES Players(player_id)
 );
 
 CREATE TABLE IF NOT EXISTS Team_Events (
