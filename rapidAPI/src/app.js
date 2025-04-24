@@ -3,6 +3,7 @@ const { initializeDatabase } = require('./services/databaseService');
 const tournamentsRoutes = require('./routes/tournamentRoutes');
 const teamsRoutes = require('./routes/teamRoutes');
 const playersRoutes = require('./routes/playerRoutes');
+const matchesRoutes = require('./routes/matchRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use('/tournaments', tournamentsRoutes);
 app.use('/teams', teamsRoutes);
 app.use('/players', playersRoutes);
+app.use('/matches', matchesRoutes);
 try{
   initializeDatabase().then(() => {
     app.listen(port, () => {

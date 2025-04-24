@@ -196,7 +196,7 @@ module.exports = {
   searchPlayers,
   getPlayersFromDb,
   deletePlayersFromDb,
-  updatePlayersInDb,
+  updatePlayersInDb
   // importPlayersbyTeam,
   // importPlayersbyName
 };

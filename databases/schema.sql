@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS Matches (
     tournament_id INT,
     match_date DATE,
     match_time TIME,
-    match_status ENUM('Scheduled', 'Playing', 'Finished', 'Postponed'),
+    match_status ENUM('Scheduled', 'In Play	', 'Finished', 'Postponed', 'Cancelled', 'Abandoned', 'Not Played'),
     home_team_score INT,
     away_team_score INT,
     FOREIGN KEY (home_team_id) REFERENCES Teams(team_id),
