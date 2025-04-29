@@ -80,28 +80,29 @@ async function findTeamStatsByFilters(filters) {
     return await executeQuery(query, queryParams);
 }
 
-// TODO
-async function getTeamStats(params) { // שאילתות לסטטיסטיקות קבוצה
-    const queryConditions = [];
-    const queryParams = [];
-
-    for (const [key, value] of Object.entries(filters)) {
-        queryConditions.push(`${key} = ?`);
-        queryParams.push(decodeURIComponent(value));
+async function getTeamMatchStatsStatistics({ groupBy, aggregates }) {
+    if (!groupBy || !aggregates || aggregates.length === 0) {
+      throw new Error('Missing groupBy or aggregates parameters');
     }
-
-    if (queryConditions.length === 0) {
-        throw new Error('No parameters provided for search');
-    }
-
-    const selectQuery = `SELECT SUM(*) FROM Teams WHERE ${queryConditions.join(' AND ')}`;
-    return await executeQuery(selectQuery, queryParams);
-}
+  
+    const selectFields = aggregates.map(agg => {
+      const [func, field] = agg.split('_');
+      return `${func.toUpperCase()}(${field}) AS ${func.toLowerCase()}_${field}`;
+    });
+  
+    const query = `
+      SELECT ${groupBy}, ${selectFields.join(', ')}
+      FROM Team_Match_Stats
+      GROUP BY ${groupBy}
+    `;
+  
+    return await executeQuery(query);
+  }
 
 module.exports = {
     insertTeamStats,
     deleteTeamStats,
     updateTeamStats,
     findTeamStatsByFilters,
-    getTeamStats
+    getTeamMatchStatsStatistics,
 };

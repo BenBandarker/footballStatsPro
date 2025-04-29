@@ -3,16 +3,8 @@ const statsService = require('../services/playerPerfService');
 async function importPlayersPerf(req, res) {
   try {
     const params = req.query;
-    // Validate parameters
-    const validation = statsService.validatePlayerPerfParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players stats from the API
-    const apiResponse = await statsService.fetchData('apiOne', `v3/fixtures/players?${queryString}`);
-    const playersStats = apiResponse.response;
+
+    const playersStats = statsService.fetchPlayerPerformanceFromApi(params);
     if (playersStats.length === 0) {
       return res.status(404).send('No players stats found');
     }
@@ -43,10 +35,7 @@ async function importPlayersPerf(req, res) {
 async function getPlayersPerfDb(req, res) {
   try {
     const filters = req.query;
-    const validation = statsService.validatePlayerPerformanceParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const playersStats = await statsService.getPlayerPerformanceFromDb(filters);
     if (playersStats.length === 0) {
       return res.status(404).send('No players stats found in the database');
@@ -61,10 +50,7 @@ async function getPlayersPerfDb(req, res) {
 async function deletePlayersPerfFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = statsService.validatePlayerPerformanceParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const result = await statsService.deletePlayerPerformance(filters);
     if (result.affectedRows === 0) {
       return res.status(404).send('No players stats found to delete');
@@ -79,10 +65,7 @@ async function deletePlayersPerfFromDb(req, res) {
 async function updatePlayersPerfInDb(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validatePlayerPerformanceParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const { performance_id, player_id, match_id, ...updateFields } = params;
     if ( !performance_id && (!player_id || !match_id_id)) {
       return res.status(400).send('Missing performance_id or player_id and match_id for WHERE clause');
@@ -101,9 +84,33 @@ async function updatePlayersPerfInDb(req, res) {
   }
 }
 
+async function getPlayerPerformanceStatistics(req, res) {
+  try {
+    const { groupBy, aggregates } = req.query;
+
+    if (!groupBy || !aggregates) {
+      return res.status(400).send('Missing groupBy or aggregates parameters');
+    }
+
+    const aggregatesArray = aggregates.split(',');
+
+    const results = await statsService.getPlayerPerformanceStatistics({ groupBy, aggregates: aggregatesArray });
+
+    if (results.length === 0) {
+      return res.status(404).send('No statistics found');
+    }
+
+    res.status(200).send(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching player performance statistics');
+  }
+}
+
 module.exports = {
   importPlayersPerf,
   getPlayersPerfDb,
   deletePlayersPerfFromDb,
-  updatePlayersPerfInDb
+  updatePlayersPerfInDb,
+  getPlayerPerformanceStatistics
 };

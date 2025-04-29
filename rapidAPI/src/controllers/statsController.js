@@ -1,17 +1,10 @@
-const statsService = require('../services/playerPerfService');
+const topService = require('../services/topStatsService');
 
 async function getStandingsByTournamentApi(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTopStatParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/standings?${queryString}`);
-    const standings = apiResponse.response;
+    
+    const standings = topService.getStandingsFromApi(params);
     if (standings.length === 0) {
       return res.status(404).send('No standings found');
     }
@@ -25,15 +18,8 @@ async function getStandingsByTournamentApi(req, res) {
 async function getTopScorersByTournamentApi(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTopStatParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players/topscorers?${queryString}`);
-    const players = apiResponse.response;
+    
+    const players = topService.getTopGoalsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -47,15 +33,8 @@ async function getTopScorersByTournamentApi(req, res) {
 async function getTopAssistsByTournamentApi(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTopStatParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players/topassist?${queryString}`);
-    const players = apiResponse.response;
+    
+    const players = topService.getTopAssistsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -70,15 +49,8 @@ async function getTopAssistsByTournamentApi(req, res) {
 async function getTopRedCardsByTournamentApi(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTopStatParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players/topredcards?${queryString}`);
-    const players = apiResponse.response;
+    
+    const players = topService.getTopRedCardsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -93,15 +65,8 @@ async function getTopRedCardsByTournamentApi(req, res) {
 async function getTopYellowCardsByTournamentApi(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTopStatParamApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players/topyellowcards?${queryString}`);
-    const players = apiResponse.response;
+    
+    const players = topService.getTopYellowCardsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }

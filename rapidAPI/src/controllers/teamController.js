@@ -3,14 +3,7 @@ const teamService = require('../services/teamService');
 async function importTeams(req, res) {
   try {
     const params = req.query;
-    const validate = teamService.validateTeamsParamsApi(params);
-    if (!validate.valid) {
-      return res.status(400).send(validate.message);
-    }
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-
-    const apiResponse = await teamService.fetchData('apiOne',`v3/teams?${queryString}`); 
-    const teams = apiResponse.response;
+    const teams = await teamService.getTeamsFromApi(params); // Fetch teams from the API
 
     if(teams.length === 0){
       res.status(404).send('No teams found');
@@ -40,14 +33,8 @@ async function importTeams(req, res) {
 async function searchTeams(req, res) {
   try {
     const params = req.query;
-    const validate = teamService.validateTeamsParamsApi(params);
-    if (!validate.valid) {
-      return res.status(400).send(validate.message);
-    }
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-    const apiResponse = await teamService.fetchData('apiOne',`v3/teams?${queryString}`); 
-    const teams = apiResponse.response
+    const teams = await teamService.getTeamsFromApi(params); // Fetch teams from the API
     if(teams.length === 0){
       res.status(404).send('No teams found');
     }
@@ -62,10 +49,6 @@ async function searchTeams(req, res) {
 async function getTeamDb(req, res) {
   try {
     const params = req.query; // Get dynamic parameters from req.query
-    const validation = teamService.validateTeamsParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
 
     const teams = await teamService.getTeamsFromDb(params);
     res.status(200).send(teams);
@@ -78,11 +61,7 @@ async function getTeamDb(req, res) {
 async function deleteTeamsDb(req, res) {
   try {
     const params = req.query;
-    const validation = teamService.validateTeamsParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    
+
     await teamService.deleteTeamsFromDb(params);
     res.status(200).send('Teams deleted successfully');
     } catch (error) {
@@ -95,10 +74,6 @@ async function deleteTeamsDb(req, res) {
   async function updateTeamsDb(req, res) {
     try{
       const params = req.query;
-      const validation = teamService.validateTeamsParamsDb(params);
-      if(!validation.valid){
-        return res.status(400).send(validation.message);
-      }
 
       const { team_id, team_api_id, ...updateFields} = params;
       if( !team_id && !team_api_id){

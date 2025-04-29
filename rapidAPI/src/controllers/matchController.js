@@ -3,16 +3,8 @@ const matchService = require('../services/matchService');
 async function importMatches(req, res) {
   try{
     const params = req.query;
-    // Validate parameters
-    const validation = matchService.validateMatchesParamsApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch matches from the API
-    const apiResponse = await matchService.fetchData('apiOne', `v3/fixtures?${queryString}`);
-    const matches = apiResponse.response;
+    
+    const matches = await matchService.getMatchesFromApi(params); // Fetch matches from the API
     if (matches.length === 0) {
       return res.status(404).send('No matches found');
     }
@@ -40,16 +32,8 @@ async function importMatches(req, res) {
 async function searchMatches(req, res) {
   try {
     const params = req.query;
-    // Validate parameters
-    const validation = matchService.validateMatchesParamsApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch matches from the API
-    const apiResponse = await matchService.fetchData('apiOne', `v3/fixtures?${queryString}`);
-    const matches = apiResponse.response;
+    
+    const matches = await matchService.getMatchesFromApi(params); // Fetch matches from the API
     if (matches.length === 0) {
       return res.status(404).send('No matches found');
     }
@@ -63,10 +47,7 @@ async function searchMatches(req, res) {
 async function getMatchesFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = matchService.validateMatchesParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const matches = await matchService.getMatchesFromDb(filters);
     if (matches.length === 0) {
       return res.status(404).send('No matches found in the database');
@@ -81,10 +62,7 @@ async function getMatchesFromDb(req, res) {
 async function deleteMatchesFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = matchService.validateMatchesParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const result = await matchService.deleteMatchesFromDb(filters);
     if (result.affectedRows === 0) {
       return res.status(404).send('No matches found to delete');
@@ -99,10 +77,7 @@ async function deleteMatchesFromDb(req, res) {
 async function updateMatchesInDb(req, res) {
   try {
     const params = req.query;
-    const validation = matchService.validateMatchesParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const { match_id, match_api_id, ... updateFields} = params;
     if(!match_id && !match_api_id) {
       return res.status(400).send('Missing identifier for update');

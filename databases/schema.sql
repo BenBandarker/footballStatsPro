@@ -114,8 +114,14 @@ CREATE TABLE IF NOT EXISTS Team_Events (
     event_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id INT NOT NULL,
     team_id INT NOT NULL,
+    player_id INT,
+    assist_id INT,
     event_type ENUM('Goal', 'Corner', 'Offside', 'Foul', 'Penalty'),
     event_time INT NOT NULL,
+    event_extra INT,
     FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
+    FOREIGN KEY (team_id) REFERENCES Teams(team_id),
+    FOREIGN KEY (player_id) REFERENCES Players(player_id),
+    FOREIGN KEY (assist_id) REFERENCES Players(player_id),
+    UNIQUE KEY unique_event (match_id, team_id, event_time, event_type)
 );

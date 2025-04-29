@@ -14,12 +14,18 @@ async function fetchData(apiName, endpoint) {
   }
 }
 
+async function fetchPlayerPerformanceFromApi(params) {
+  const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  // Fetch players stats from the API
+  const apiResponse = await fetchData('apiOne', `v3/fixtures/players?${queryString}`);
+  return apiResponse.response;
+}
+
 function buildParams(rawParams, options = {}) {
   const { floatFields = [], booleanFields = [], enumFieldIndex = null, enumMap = {} } = options;
 
   return rawParams.map((value, index) => {
     if (value === undefined || value === null) {
-      // enumFieldIndex מחזיר null אם מדובר בשדה ENUM
       return (index === enumFieldIndex) ? null : 0;
     }
     if (index === enumFieldIndex && enumMap[value]) {
@@ -86,7 +92,7 @@ async function savePlayerPerformanceToDatabase(player_id, match_id, stats) {
 }
 
 async function getPlayerPerformanceFromDb(filters) {
-  return await Stats.getPlayerPerformance(filters);
+  return await Stats.findPlayerPerformanceByFilters(filters);
 }
 
 async function deletePlayerPerformance(params) {
@@ -97,134 +103,15 @@ async function updatePlayerPerformance(identifiers, updateFields) {
   return await Stats.updatePlayerPerformance(identifiers, updateFields);
 }
 
-async function validatePlayerPerfParamApi(params) {
-  if(!params.fixture || !params.team) {
-    return { valid: false, message: 'Missing required parameters: fixture and team' };
-  }
-  
-  for (const [key, value] of Object.entries(params)) {
-    switch(key) {
-      case 'fixture':
-        fix_value = parseInt(value);
-        if (!value || typeof fix_value !== 'number') {
-          return { valid: false, message: 'Invalid fixture parameter' };
-        }
-        break;
-      case 'team':
-        team_value = parseInt(value);
-        if (!value || typeof team_value !== 'number') {
-          return { valid: false, message: 'Invalid team parameter' };
-        }
-        break;
-      default:
-        return { valid: false, message: `Unknown parameter: ${key}` };
-    }
-  }
-  return { valid: true };
-}
-
-async function validatePlayerPerformanceParamsDb(params) {
-  const enumPositions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
-
-  for (const [key, value] of Object.entries(params)) {
-    switch (key) {
-      case 'performance_id':
-      case 'player_id':
-      case 'match_id':
-      case 'minutes_played':
-      case 'offsides':
-      case 'total_shots':
-      case 'shots_on_target':
-      case 'goals':
-      case 'conceded_goals':
-      case 'assists':
-      case 'saves':
-      case 'total_passes':
-      case 'key_passes':
-      case 'total_tackles':
-      case 'blocks':
-      case 'interceptions':
-      case 'total_duels':
-      case 'duels_won':
-      case 'dribbles_attempted':
-      case 'dribbles_completed':
-      case 'dribble_pasts':
-      case 'fouls_drawn':
-      case 'fouls_committed':
-      case 'yellow_cards':
-      case 'red_cards':
-      case 'penalty_won':
-      case 'penalty_committed':
-      case 'penalty_scored':
-      case 'penalty_missed':
-      case 'penalty_saved':
-        if (value === undefined || isNaN(parseInt(value))) {
-          return { valid: false, message: `Invalid or missing integer for ${key}` };
-        }
-        break;
-
-      case 'position':
-        if (!enumPositions.includes(value)) {
-          return { valid: false, message: `Invalid position value: ${value}` };
-        }
-        break;
-
-      case 'rating':
-      case 'pass_accuracy':
-        if (value === undefined || isNaN(parseFloat(value))) {
-          return { valid: false, message: `Invalid decimal value for ${key}` };
-        }
-        break;
-
-      case 'captain':
-      case 'substitute':
-        if (typeof value !== 'boolean' && value !== 0 && value !== 1) {
-          return { valid: false, message: `Invalid boolean value for ${key}` };
-        }
-        break;
-
-      default:
-        return { valid: false, message: `Unknown or invalid parameter: ${key}` };
-    }
-  }
-
-  return { valid: true };
-}
-
-
-async function validateTopStatParamApi(params) {
-  const currentYear = new Date().getFullYear();
-  if(!params.league || !params.season) {
-    return { valid: false, message: 'Missing required parameters: league and season' };
-  }
-  for (const [key, value] of Object.entries(params)) {
-    switch(key) {
-      case 'league':
-        league_value = parseInt(value);
-        if (!value || typeof league_value !== 'number') {
-          return { valid: false, message: 'Invalid league parameter' };
-        }
-        break;
-      case 'season':
-        num_value = parseInt(value);
-        if (!num_value || typeof num_value !== 'number' || num_value < 2010 || num_value > currentYear) {
-          return { valid: false, message: 'Invalid season parameter. Make sure the season is between 2010 and the current year.' };
-        }
-        break;
-      default:
-        return { valid: false, message: `Unknown parameter: ${key}` };
-    }
-  }
-  return { valid: true };
+async function getPlayerPerformanceStatistics({ groupBy, aggregates }) {
+  return await playerPerformanceModel.getPlayerPerformanceStatistics({ groupBy, aggregates });
 }
 
 module.exports = {
-  fetchData,
+  fetchPlayerPerformanceFromApi,
   savePlayerPerformanceToDatabase,
   getPlayerPerformanceFromDb,
   deletePlayerPerformance,
   updatePlayerPerformance,
-  validatePlayerPerfParamApi,
-  validatePlayerPerformanceParamsDb,
-  validateTopStatParamApi
+  getPlayerPerformanceStatistics,
 };

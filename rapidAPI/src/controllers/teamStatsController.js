@@ -3,15 +3,8 @@ const statsService = require('../services/teamStatsService');
 async function importTeamsStats(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTeamStatsParamsApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
 
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    
-    const apiResponse = await statsService.fetchData('apiOne', `v3/fixtures/statistics?${queryString}`);
-    const teamsStats = apiResponse.response;
+    const teamsStats = statsService.fetchTeamStatsFromApi(params);
     if (teamsStats.length === 0) {
       return res.status(404).send('No teams stats found');
     }
@@ -39,11 +32,8 @@ async function importTeamsStats(req, res) {
 async function getTeamsStatsDb(req, res) {
   try {
     const filters = req.query;
-    const validation = statsService.validateTeamMatchStatsParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    const teamsStats = await statsService.getTeamsStatsFromDb(filters);
+
+    const teamsStats = await statsService.getTeamStatsFromDb(filters);
     if (teamsStats.length === 0) {
       return res.status(404).send('No teams stats found in the database');
     }
@@ -57,14 +47,11 @@ async function getTeamsStatsDb(req, res) {
 async function deleteTeamsStatsFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = statsService.validateTeamMatchStatsParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     if( !filters.stat_id && (!filters.team_id || !filters.match_id)) {
       return res.status(400).send('Missing stat_id or team_id and match_id for WHERE clause');
     }
-    const result = await statsService.deleteTeamsStatsFromDb(filters);
+    const result = await statsService.deleteTeamStatsFromDb(filters);
     if (result.affectedRows === 0) {
       return res.status(404).send('No teams stats found to delete');
     }
@@ -79,10 +66,7 @@ async function deleteTeamsStatsFromDb(req, res) {
 async function updateTeamsStatsInDb(req, res) {
   try {
     const params = req.query;
-    const validation = statsService.validateTeamMatchStatsParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const { stat_id, match_id, team_id,...updateFields } = params;
     if(!stat_id && (!team_id || !match_id)) {
       return res.status(400).send('Missing stat_id or team_id and match_id for WHERE clause');
@@ -101,9 +85,33 @@ async function updateTeamsStatsInDb(req, res) {
   }
 }
 
+async function getTeamMatchStatsStatistics(req, res) {
+  try {
+    const { groupBy, aggregates } = req.query;
+
+    if (!groupBy || !aggregates) {
+      return res.status(400).send('Missing groupBy or aggregates parameters');
+    }
+
+    const aggregatesArray = aggregates.split(',');
+
+    const results = await statsService.getTeamMatchStatsStatistics({ groupBy, aggregates: aggregatesArray });
+
+    if (results.length === 0) {
+      return res.status(404).send('No statistics found');
+    }
+
+    res.status(200).send(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching team match stats statistics');
+  }
+}
+
 module.exports = {
   importTeamsStats,
   getTeamsStatsDb,
   deleteTeamsStatsFromDb,
-  updateTeamsStatsInDb
+  updateTeamsStatsInDb,
+  getTeamMatchStatsStatistics
 };

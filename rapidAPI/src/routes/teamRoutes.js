@@ -1,11 +1,12 @@
 const express = require('express');
-const { importTeams, searchTeams, getTeamDb, deleteTeamsDb, updateTeamsDb } = require('../controllers/teamController');
+const teamController = require('../controllers/teamController');
+const { validateTeamParamsApi, validateTeamParamsDb } = require('../middlewares/teamValidator');
 const router = express.Router();
 
-router.post('/import', importTeams);
-router.get('/search', searchTeams);
-router.get('/get', getTeamDb);
-router.delete('/delete', deleteTeamsDb);
-router.put('/update', updateTeamsDb);
+router.post('/import', validateTeamParamsApi, teamController.importTeams);
+router.get('/search', validateTeamParamsApi, teamController.searchTeams);
+router.get('/get', validateTeamParamsDb, teamController.getTeamDb);
+router.delete('/delete', validateTeamParamsDb, teamController.deleteTeamsDb);
+router.put('/update', validateTeamParamsDb, teamController.updateTeamsDb);
 
 module.exports = router;

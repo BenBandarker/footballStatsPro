@@ -4,16 +4,8 @@ const playerService = require('../services/playerService');
 async function importPlayers(req, res) {
   try {
     const params = req.query;
-    // Validate parameters
-    const validation = playerService.validatePlayersParamsApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players?${queryString}`);
-    const players = apiResponse.response;
+
+    const players = await playerService.getPlayersFromApi(params); // Fetch players from the API
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -41,16 +33,8 @@ async function importPlayers(req, res) {
 async function searchPlayers(req, res) {
   try {
     const params = req.query;
-    // Validate parameters
-    const validation = playerService.validatePlayersParamsApi(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
-    // Build query string for API call
-    const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-    // Fetch players from the API
-    const apiResponse = await playerService.fetchData('apiOne', `v3/players?${queryString}`);
-    const players = apiResponse.response;
+
+    const players = await playerService.getPlayersFromApi(params); // Fetch players from the API
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -64,10 +48,7 @@ async function searchPlayers(req, res) {
 async function getPlayersFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = playerService.validatePlayersParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const players = await playerService.getPlayersFromDb(filters);
     if (players.length === 0) {
       return res.status(404).send('No players found in the database');
@@ -82,10 +63,7 @@ async function getPlayersFromDb(req, res) {
 async function deletePlayersFromDb(req, res) {
   try {
     const filters = req.query;
-    const validation = playerService.validatePlayersParamsDb(filters);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
+
     const result = await playerService.deletePlayersFromDb(filters);
     if (result.affectedRows === 0) {
       return res.status(404).send('No players found to delete');
@@ -100,11 +78,6 @@ async function deletePlayersFromDb(req, res) {
 async function updatePlayersInDb(req, res) {
   try {
     const params = req.query;
-
-    const validation = playerService.validatePlayersParamsDb(params);
-    if (!validation.valid) {
-      return res.status(400).send(validation.message);
-    }
 
     const { player_id, player_api_id, ...updateFields } = params;
 

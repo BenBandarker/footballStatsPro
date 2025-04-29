@@ -88,28 +88,31 @@ async function findPlayerPerformanceByFilters(filters) {
     return await executeQuery(query, queryParams);
 }
 
-// TODO
-async function getPlayerStats(params) { // שאילתות לסטטיסטיקות שחקן
-    const queryConditions = [];
-    const queryParams = [];
-
-    for (const [key, value] of Object.entries(params)) {
-        queryConditions.push(`${key} = ?`);
-        queryParams.push(decodeURIComponent(value));
+async function getPlayerPerformanceStatistics({ groupBy, aggregates }) {
+    if (!groupBy || !aggregates || aggregates.length === 0) {
+        throw new Error('Missing groupBy or aggregates parameters');
     }
 
-    if (queryConditions.length === 0) {
-        throw new Error('No parameters provided for search');
-    }
+    const selectFields = aggregates.map(agg => {
+        const [func, field] = agg.split('_');
+        return `${func.toUpperCase()}(${field}) AS ${func.toLowerCase()}_${field}`;
+    });
 
-    const selectQuery = `SELECT SUM(*) FROM Players WHERE ${queryConditions.join(' AND ')}`;
-    return await executeQuery(selectQuery, queryParams);
+    const query = `
+        SELECT ${groupBy}, ${selectFields.join(', ')}
+        FROM Player_Performance
+        GROUP BY ${groupBy}
+    `;
+
+    return await executeQuery(query);
 }
+
+
 
 module.exports = {
     insertPlayerPerformance,
     deletePlayerPerformance,
     updatePlayerPerformance,
     findPlayerPerformanceByFilters,
-    getPlayerStats,
+    getPlayerPerformanceStatistics,
 };
