@@ -1,4 +1,4 @@
-const tournamentService = require('../services/tournamentService');
+const tournamentService = require('../services/tournamentService'); // Import the tournament service
 
 // Handles the tournament import process: validates query parameters,
 // fetches tournament data from an external API, and saves it to the database.
@@ -100,7 +100,10 @@ async function updateTournamentsDb(req, res) {
       return res.status(400).send('No fields provided for update');
     }
 
-    await tournamentService.updateTournamentsInDb({ tournament_id, tournament_api_id }, updateFields);
+    const result = await tournamentService.updateTournamentsInDb({ tournament_id, tournament_api_id }, updateFields);
+    if( result.affectedRows === 0) {
+      return res.status(404).send('No tournaments found to update');
+    }
     res.status(200).send('Tournament updated successfully');
   } catch (error) {
     console.error(error);

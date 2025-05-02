@@ -5,25 +5,33 @@ async function importTeams(req, res) {
     const params = req.query;
     const teams = await teamService.getTeamsFromApi(params); // Fetch teams from the API
 
-    if(teams.length === 0){
-      res.status(404).send('No teams found');
+    if (!teams || teams.length === 0) {
+      return res.status(404).send('No teams found');
     }
-    else{
-      for(const { team, venue } of teams){
-        try {
-          await teamService.saveTeamToDatabase(team, venue.name); // Attempt to save the team
-        } catch (error) {
-          // Handle duplicate entry error and log the skipped team
-          if (error.code === 'ER_DUP_ENTRY') {
-            console.log(`Duplicate entry for team API-ID ${team.team.id}, skipping...`);
-          } else {
-            console.error(`Error saving team API-ID ${team.team.id}: ${error.message}`);
-            throw error; 
-          }
+
+    for (const entry of teams) {
+      const { team, venue } = entry;
+
+      if (!team || !team.id) {
+        console.warn('Invalid team data structure, skipping entry:', entry);
+        continue;
+      }
+
+      const venueName = venue && venue.name ? venue.name : null;
+
+      try {
+        await teamService.saveTeamToDatabase(team, venueName);
+      } catch (error) {
+        if (error.code === 'ER_DUP_ENTRY') {
+          console.log(`Duplicate entry for team API-ID ${team.id}, skipping...`);
+        } else {
+          console.error(`Error saving team API-ID ${team.id}: ${error.message}`);
+          throw error;
         }
       }
-      res.status(201).send('Teams imported successfully');
     }
+
+    res.status(201).send('Teams imported successfully');
   } catch (error) {
     console.error('Failed to import teams:', error);
     res.status(500).send('Error importing teams');
@@ -62,7 +70,10 @@ async function deleteTeamsDb(req, res) {
   try {
     const params = req.query;
 
-    await teamService.deleteTeamsFromDb(params);
+    const result = await teamService.deleteTeamsFromDb(params);
+    if(result.affectedRows === 0) {
+      return res.status(404).send('No teams found to delete');
+    }
     res.status(200).send('Teams deleted successfully');
     } catch (error) {
       console.error(error);
@@ -84,7 +95,10 @@ async function deleteTeamsDb(req, res) {
         return res.status(400).send('No fields provided for update');
       }
 
-      await teamService.updateTeamssInDb({ team_id, team_api_id }, updateFields);
+      const result = await teamService.updateTeamssInDb({ team_id, team_api_id }, updateFields);
+      if(result.affectedRows === 0){
+        return res.status(404).send('No teams found to update');
+      }
       res.status(200).send('Team updated successfully');
     } catch (error){
       console.error(error);

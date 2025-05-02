@@ -18,7 +18,7 @@ router.delete('/deletePlayersPerf', validator.validatePlayerPerformanceDb, playe
 router.put('/updatePlayersPerf', validator.validatePlayerPerformanceDb, playerPerfController.updatePlayersPerfInDb);
 router.get('/playerStatistics',validator.validatePlayerStatisticsParams,  playerPerfController.getPlayerPerformanceStatistics);
 
-router.get('/importTeamsStats', validator.validateTeamStatsAPI, teamStatsController.importTeamsStats);
+router.post('/importTeamsStats', validator.validateTeamStatsAPI, teamStatsController.importTeamsStats);
 router.get('/getTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.getTeamsStatsDb);
 router.delete('/deleteTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.deleteTeamsStatsFromDb);
 router.put('/updateTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.updateTeamsStatsInDb);

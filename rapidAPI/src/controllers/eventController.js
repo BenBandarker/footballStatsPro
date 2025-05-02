@@ -18,7 +18,7 @@ async function importEvent(req, res) {
         if (error.code === 'ER_DUP_ENTRY') {
           console.log(`Duplicate entry for (match_id, team_id, event_time, event_type) ${params.fixture} & ${event.team.id} & ${event.time.elapsed} & ${event.type}, skipping...`);
         } else {
-          console.error(`Error saving player API-ID ${playerStat.player.id}: ${error.message}`);
+          console.error(`Error saving player API-ID ${event.player.id}: ${error.message}`);
           throw error; 
         }
       

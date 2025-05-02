@@ -1,5 +1,5 @@
 
-async function validateTopStatParamApi(params) {
+function validateTopStatParamApi(params) {
   const currentYear = new Date().getFullYear();
   if(!params.league || !params.season) {
     return { valid: false, message: 'Missing required parameters: league and season' };
@@ -7,14 +7,14 @@ async function validateTopStatParamApi(params) {
   for (const [key, value] of Object.entries(params)) {
     switch(key) {
       case 'league':
-        league_value = parseInt(value);
-        if (!value || typeof league_value !== 'number') {
+        const league_value = parseInt(value);
+        if ((isNaN(league_value)) || typeof league_value !== 'number') {
           return { valid: false, message: 'Invalid league parameter' };
         }
         break;
       case 'season':
-        num_value = parseInt(value);
-        if (!num_value || typeof num_value !== 'number' || num_value < 2010 || num_value > currentYear) {
+        const num_value = parseInt(value);
+        if ((isNaN(num_value)) || typeof num_value !== 'number' || num_value < 2010 || num_value > currentYear) {
           return { valid: false, message: 'Invalid season parameter. Make sure the season is between 2010 and the current year.' };
         }
         break;
@@ -25,16 +25,54 @@ async function validateTopStatParamApi(params) {
   return { valid: true };
 }
 
+// async function validateTopStatParamApi(params) {
+//   const currentYear = new Date().getFullYear();
+
+//   if (!params.league || !params.season) {
+//     return { valid: false, message: 'Missing required parameters: league and season' };
+//   }
+
+//   for (const [key, value] of Object.entries(params)) {
+//     switch (key) {
+//       case 'league': {
+//         const leagueValue = parseInt(value);
+//         if (isNaN(leagueValue)) {
+//           return { valid: false, message: 'Invalid league parameter. Must be a number.' };
+//         }
+//         break;
+//       }
+//       case 'season': {
+//         const seasonValue = parseInt(value);
+//         if ( isNaN(seasonValue) || seasonValue < 2010 || seasonValue > currentYear ) {
+//           return {valid: false, message: `Invalid season parameter. Must be a number between 2010 and ${currentYear}.`,
+//           };
+//         }
+//         break;
+//       }
+//       default:
+//         return { valid: false, message: `Unknown parameter: ${key}` };
+//     }
+//   }
+
+//   return { valid: true };
+// }
+
 function validateTopStatsAPI(req, res, next) {
   const validation = validateTopStatParamApi(req.query);
+
   if (!validation.valid) {
+    console.warn(' Validation failed:', {
+      query: req.query,
+      message: validation.message
+    });
+
     return res.status(400).send(validation.message);
   }
+
   next();
 }
 
-
-async function validateTeamStatsParamsApi(params) { 
+function validateTeamStatsParamsApi(params) { 
   if(!params.fixture || !params.team) {
     return { valid: false, message: 'Missing required parameters: fixture and team' };
   }
@@ -68,7 +106,7 @@ function validateTeamStatsAPI(req, res, next) {
   next();
 }
 
-async function validateTeamMatchStatsParamsDb(params) {
+function validateTeamMatchStatsParamsDb(params) {
   for (const [key, value] of Object.entries(params)) {
     switch (key) {
       case 'stat_id':
@@ -116,7 +154,7 @@ function validateTeamMatchStatsDb(req, res, next) {
   next();
 }
 
-async function validatePlayerPerfParamApi(params) {
+function validatePlayerPerfParamApi(params) {
   if(!params.fixture || !params.team) {
     return { valid: false, message: 'Missing required parameters: fixture and team' };
   }
@@ -150,7 +188,7 @@ function validatePlayerPerfAPI(req, res, next) {
   next();
 }
 
-async function validatePlayerPerformanceParamsDb(params) {
+function validatePlayerPerformanceParamsDb(params) {
   const enumPositions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
 
   for (const [key, value] of Object.entries(params)) {
@@ -226,7 +264,7 @@ function validatePlayerPerformanceDb(req, res, next) {
   next();
 }
 
-async function validateEventParamApi(params) {
+function validateEventParamApi(params) {
   if(!params.fixture ) {
     return { valid: false, message: 'Missing required parameters: fixture' };
   }
@@ -266,7 +304,7 @@ function validateEventAPI(req, res, next) {
   next();
 }
 
-async function validateEventsParamsDb(params) {
+function validateEventsParamsDb(params) {
   const enumEventTypes = ['Goal', 'Corner', 'Offside', 'Foul', 'Penalty'];
 
   for (const [key, value] of Object.entries(params)) {

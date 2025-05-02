@@ -4,7 +4,7 @@ async function importPlayersPerf(req, res) {
   try {
     const params = req.query;
 
-    const playersStats = statsService.fetchPlayerPerformanceFromApi(params);
+    const playersStats = await statsService.fetchPlayerPerformanceFromApi(params);
     if (playersStats.length === 0) {
       return res.status(404).send('No players stats found');
     }

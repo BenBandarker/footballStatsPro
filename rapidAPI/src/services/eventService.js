@@ -22,18 +22,49 @@ async function getEventsFromApi(params) {
 }
 
 async function saveEventToDatabase(match_id, event) {
-  const param = [
-    match_id,
-    event.team.id,
-    event.player.id,
-    event.assist.id,
-    event.type,
-    event.time.elapsed,
-    event.time.extra
+  const rawParams = [
+    parseInt(match_id),                            // match_id: number
+    parseInt(event?.team?.id),                     // team_id
+    parseInt(event?.player?.id),                   // player_id
+    parseInt(event?.assist?.id),                   // assist_id
+    typeof event?.type === 'string' ? event.type : null,   // event_type
+    parseInt(event?.time?.elapsed),                // event_time
+    event?.time?.extra !== undefined ? parseInt(event.time.extra) : null // event_extra
   ];
-  await eventModel.insertEvent(param);
-}
 
+  const safeParams = rawParams.map((val, idx) => {
+    if (val === undefined || val === null || Number.isNaN(val)) {
+      console.warn(`Param at index ${idx} is invalid (undefined/null/NaN), setting to null`);
+      return null;
+    }
+    if (typeof val === 'object') {
+      console.warn(`Param at index ${idx} is an object. Setting to null.`, val);
+      return null;
+    }
+    return val;
+  });
+
+  if (safeParams.length !== 7) {
+    console.error(`Param length mismatch: expected 7, got ${safeParams.length}`);
+    return;
+  }
+
+  console.log('Attempting to insert event with params:', safeParams);
+
+  try {
+    await eventModel.insertEvent(safeParams);
+  } catch (error) {
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      console.warn(`Skipping event: foreign key violation — likely missing player, team, or match`);
+    } else if (error.code === 'ER_DUP_ENTRY') {
+      console.warn(`Duplicate event found. Skipping.`);
+    } else if (error.code === 'ER_MALFORMED_PACKET') {
+      console.error('Malformed packet! One of the values is invalid:', safeParams);
+    } else {
+      console.error('Unexpected DB error:', error);
+    }
+  }
+}
 async function getEventFromDb(filters) {
   return await eventModel.findEventByFilters(filters);
 }

@@ -26,18 +26,24 @@ function buildParams(rawParams, options = {}) {
 
   return rawParams.map((value, index) => {
     if (value === undefined || value === null) {
-      return (index === enumFieldIndex) ? null : 0;
+      return null;
     }
-    if (index === enumFieldIndex && enumMap[value]) {
-      return enumMap[value];
+
+    if (index === enumFieldIndex) {
+      return enumMap.hasOwnProperty(value) ? enumMap[value] : null;
     }
+
     if (floatFields.includes(index)) {
-      return parseFloat(parseFloat(value).toFixed(2));
+      const floatVal = parseFloat(value);
+      return isNaN(floatVal) ? null : parseFloat(floatVal.toFixed(2));
     }
+
     if (booleanFields.includes(index)) {
       return Boolean(value);
     }
-    return parseInt(value);
+
+    const intVal = parseInt(value);
+    return isNaN(intVal) ? null : intVal;
   });
 }
 
@@ -45,38 +51,38 @@ async function savePlayerPerformanceToDatabase(player_id, match_id, stats) {
   const rawParams = [
     player_id,
     match_id,
-    stats[0]?.games?.minutes,
-    stats[0]?.games?.position,
-    stats[0]?.games?.rating,
-    stats[0]?.games?.captain,
-    stats[0]?.games?.substitute,
-    stats[0]?.offsides,
-    stats[0]?.shots?.total,
-    stats[0]?.shots?.on,
-    stats[0]?.goals?.total,
-    stats[0]?.goals?.conceded,
-    stats[0]?.goals?.assists,
-    stats[0]?.goals?.saves,
-    stats[0]?.passes?.total,
-    stats[0]?.passes?.key,
-    stats[0]?.passes?.accuracy,
-    stats[0]?.tackles?.total,
-    stats[0]?.tackles?.blocks,
-    stats[0]?.tackles?.interceptions,
-    stats[0]?.duels?.total,
-    stats[0]?.duels?.won,
-    stats[0]?.dribbles?.attempts,
-    stats[0]?.dribbles?.success,
-    stats[0]?.dribbles?.past,
-    stats[0]?.fouls?.drawn,
-    stats[0]?.fouls?.committed,
-    stats[0]?.cards?.yellow,
-    stats[0]?.cards?.red,
-    stats[0]?.penalty?.won,
-    stats[0]?.penalty?.committed,
-    stats[0]?.penalty?.scored,
-    stats[0]?.penalty?.missed,
-    stats[0]?.penalty?.saved
+    stats?.games?.minutes,
+    stats?.games?.position,
+    stats?.games?.rating,
+    stats?.games?.captain,
+    stats?.games?.substitute,
+    stats?.offsides,
+    stats?.shots?.total,
+    stats?.shots?.on,
+    stats?.goals?.total,
+    stats?.goals?.conceded,
+    stats?.goals?.assists,
+    stats?.goals?.saves,
+    stats?.passes?.total,
+    stats?.passes?.key,
+    stats?.passes?.accuracy,
+    stats?.tackles?.total,
+    stats?.tackles?.blocks,
+    stats?.tackles?.interceptions,
+    stats?.duels?.total,
+    stats?.duels?.won,
+    stats?.dribbles?.attempts,
+    stats?.dribbles?.success,
+    stats?.dribbles?.past,
+    stats?.fouls?.drawn,
+    stats?.fouls?.committed,
+    stats?.cards?.yellow,
+    stats?.cards?.red,
+    stats?.penalty?.won,
+    stats?.penalty?.committed,
+    stats?.penalty?.scored,
+    stats?.penalty?.missed,
+    stats?.penalty?.saved
   ];
 
   const options = {
@@ -87,8 +93,28 @@ async function savePlayerPerformanceToDatabase(player_id, match_id, stats) {
   };
 
   const params = buildParams(rawParams, options);
-
-  await Stats.insertPlayerPerformance(params);
+  if (params.length !== 34) {
+    console.error(` Param count mismatch! Got ${params.length} instead of 35`);
+    console.log('Params:', params);
+    // logSkippedPlayer(player_id, match_id, `Param count mismatch: got ${params.length}`);
+    return;
+  }
+  
+  try {
+    await Stats.insertPlayerPerformance(params);
+  } catch (error) {
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      console.warn(` Skipping player ${player_id} — not found in Players table`);
+      // logSkippedPlayer(player_id, match_id, 'Player not found in Players table (FK error)');
+      return;
+    } else if (error.code === 'ER_DUP_ENTRY') {
+      console.log(` Duplicate entry for player ${player_id} & match ${match_id}, skipping...`);
+      return;
+    } else {
+      console.error(` Error saving player ${player_id} in match ${match_id}: ${error.message}`);
+      throw error;
+    }
+  }
 }
 
 async function getPlayerPerformanceFromDb(filters) {

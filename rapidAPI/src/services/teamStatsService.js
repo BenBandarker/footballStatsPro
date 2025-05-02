@@ -21,23 +21,34 @@ async function fetchTeamStatsFromApi(params) {
   return apiResponse.response;
 }
 
-function buildParams(rawParams, options = {}) { 
+function buildParams(rawParams, options = {}) {
   const { floatFields = [], booleanFields = [], enumFieldIndex = null, enumMap = {} } = options;
 
   return rawParams.map((value, index) => {
+    // כל ערך חסר → null
     if (value === undefined || value === null) {
-      return (index === enumFieldIndex) ? null : 0;
+      return null;
     }
-    if (index === enumFieldIndex && enumMap[value]) {
-      return enumMap[value];
+
+    if (index === enumFieldIndex) {
+      return enumMap.hasOwnProperty(value) ? enumMap[value] : null;
     }
+
     if (floatFields.includes(index)) {
-      return parseFloat(parseFloat(value).toFixed(2));
+      if (typeof value === 'string' && value.endsWith('%')) {
+        const numeric = parseFloat(value.replace('%', ''));
+        return isNaN(numeric) ? null : parseFloat(numeric.toFixed(2));
+      }
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? null : parseFloat(parsed.toFixed(2));
     }
+
     if (booleanFields.includes(index)) {
       return Boolean(value);
     }
-    return parseInt(value);
+
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? null : parsed;
   });
 }
 
@@ -69,6 +80,12 @@ async function saveTeamStatsToDatabase(match_id, response) {
   };
 
   const params = buildParams(rawParams, options);
+
+  if (params.length !== 18) {
+    console.error(` Param count mismatch for Team_Match_Stats. Got ${params.length} instead of 18`);
+    console.log('Params:', params);
+    return;
+  }
 
   await Stats.insertTeamStats(params);
 }

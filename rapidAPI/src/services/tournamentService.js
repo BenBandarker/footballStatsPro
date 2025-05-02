@@ -19,7 +19,7 @@ async function getTournamentsFromApi(params) {
   const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
   // Fetch tournaments from the API
-  const apiResponse = await tournamentService.fetchData('apiOne', `v3/leagues?${queryString}`);
+  const apiResponse = await fetchData('apiOne', `v3/leagues?${queryString}`);
   return apiResponse.response;
 }
 

@@ -4,7 +4,7 @@ async function getStandingsByTournamentApi(req, res) {
   try {
     const params = req.query;
     
-    const standings = topService.getStandingsFromApi(params);
+    const standings = await topService.getStandingsFromApi(params);
     if (standings.length === 0) {
       return res.status(404).send('No standings found');
     }
@@ -19,7 +19,7 @@ async function getTopScorersByTournamentApi(req, res) {
   try {
     const params = req.query;
     
-    const players = topService.getTopGoalsFromApi(params);
+    const players = await topService.getTopGoalsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -34,7 +34,7 @@ async function getTopAssistsByTournamentApi(req, res) {
   try {
     const params = req.query;
     
-    const players = topService.getTopAssistsFromApi(params);
+    const players = await topService.getTopAssistsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -50,7 +50,7 @@ async function getTopRedCardsByTournamentApi(req, res) {
   try {
     const params = req.query;
     
-    const players = topService.getTopRedCardsFromApi(params);
+    const players = await topService.getTopRedCardsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }
@@ -66,7 +66,7 @@ async function getTopYellowCardsByTournamentApi(req, res) {
   try {
     const params = req.query;
     
-    const players = topService.getTopYellowCardsFromApi(params);
+    const players = await topService.getTopYellowCardsFromApi(params);
     if (players.length === 0) {
       return res.status(404).send('No players found');
     }

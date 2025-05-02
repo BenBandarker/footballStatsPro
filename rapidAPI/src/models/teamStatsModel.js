@@ -4,7 +4,7 @@ async function insertTeamStats(params) {
     const insertQuery = `
         INSERT INTO Team_Match_Stats
         (match_id, team_id, shots_on_goal, shots_off_goal, total_shots, blocked_shots, shots_insidebox, shots_outsidebox, fouls, corner_kicks, offsides, ball_possession, yellow_cards, red_cards, goalkeeper_saves, total_passes, passes_accurate, pass_accuracy)
-        VALUES (?,?,?,?<?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
     return await executeQuery(insertQuery, params);
 }
 

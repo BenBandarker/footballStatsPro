@@ -3,10 +3,10 @@ const { executeQuery } = require('../services/databaseService');
 async function insertEvent(params) { 
     const insertQuery = `
         INSERT INTO Team_Events (
-            match_id, team_id, player_id, assist_id, event_type, event_time
+            match_id, team_id, player_id, assist_id, event_type, event_time, event_extra
         ) 
         VALUES (
-            ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?
         )
     `;
     return await executeQuery(insertQuery, params);

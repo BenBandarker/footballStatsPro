@@ -17,7 +17,7 @@ async function fetchData(apiName, endpoint) {
 async function getPlayersFromApi(params) {
   const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   // Fetch players from the API
-  const apiResponse = await playerService.fetchData('apiOne', `v3/players?${queryString}`);
+  const apiResponse = await fetchData('apiOne', `v3/players?${queryString}`);
   return apiResponse.response;
 }
 
