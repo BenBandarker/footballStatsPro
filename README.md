@@ -63,7 +63,7 @@ Steps will be added as the project progresses.
 
 ### **1. Clone the Repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/soccer-stats-project.git
+git clone https://github.com/BenBandarker/footballStatsPro.git
 cd soccer-stats-project
 ```
 
