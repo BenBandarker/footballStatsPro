@@ -1,11 +1,16 @@
 const matchService = require('../services/matchService');
 
-async function importMatches(req, res) {
+// Import data from API and insert into the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
+async function importMatches(req, res, internalCall = false) {
   try{
     const params = req.query;
     
     const matches = await matchService.getMatchesFromApi(params); // Fetch matches from the API
     if (matches.length === 0) {
+      if(internalCall) 
+        return []; // Return empty array if called internally
       return res.status(404).send('No matches found');
     }
     // Save matches to the database
@@ -22,13 +27,19 @@ async function importMatches(req, res) {
         }
       }
     }
+
+    if (internalCall) return matches; // Return matches if called internally
     res.status(201).send('Matches imported successfully');
   } catch (error) {
     console.error(error);
+    if (internalCall) throw error; // Rethrow error if called internally
     res.status(500).send('Error importing matches');
   }
 }
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function searchMatches(req, res) {
   try {
     const params = req.query;
@@ -44,6 +55,9 @@ async function searchMatches(req, res) {
   }
 }
 
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getMatchesFromDb(req, res) {
   try {
     const filters = req.query;
@@ -59,6 +73,9 @@ async function getMatchesFromDb(req, res) {
   }
 }
 
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function deleteMatchesFromDb(req, res) {
   try {
     const filters = req.query;
@@ -74,6 +91,9 @@ async function deleteMatchesFromDb(req, res) {
   }
 }
 
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function updateMatchesInDb(req, res) {
   try {
     const params = req.query;

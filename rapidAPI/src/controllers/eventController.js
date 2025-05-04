@@ -1,12 +1,17 @@
 const eventService = require('../services/eventService');
 
-async function importEvent(req, res) {
+// Import data from API and insert into the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
+async function importEvent(req, res, internalCall = false) {
   try {
     const params = req.query;
 
     // Fetch players stats from the API
     const matchEvents = await eventService.getEventsFromApi(params);
     if (matchEvents.length === 0) {
+      if( internalCall ) 
+        return []; // Return an empty array for internal calls
       return res.status(404).send('No players stats found');
     }
     // Save players stats to the database
@@ -24,14 +29,20 @@ async function importEvent(req, res) {
       
       }
     }
-
+    if ( internalCall ) 
+      return matchEvents; // Return the events for internal calls
     res.status(201).send('Match events imported successfully');
   } catch (error) {
     console.error(error);
+    if ( internalCall )
+      throw error; // Rethrow the error for internal calls
     res.status(500).send('Error importing Match events');
   }
 }
 
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
 async function getEventDb(req, res) {
   try {
     const filters = req.query;
@@ -47,6 +58,9 @@ async function getEventDb(req, res) {
   }
 }
 
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
 async function deleteEventFromDb(req, res) {
   try {
     const filters = req.query;
@@ -62,6 +76,9 @@ async function deleteEventFromDb(req, res) {
   }
 }
 
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object
 async function updateEventDb(req, res) {
   try {
     const params = req.query;
@@ -84,6 +101,19 @@ async function updateEventDb(req, res) {
   }
 }
 
+/**
+ * Retrieve data from the database.
+ * Accepts request and response objects (req, res).
+ * Example: req.query = {
+ *   groupBy: 'player_id',
+ *   aggregates: JSON.stringify([
+ *     { field: 'goals', operation: 'SUM' },
+ *     { field: 'minutes_played', operation: 'AVG' }
+ *   ]),
+ *   filters: JSON.stringify({ match_id: 101, team_id: 22 })
+ * }
+ * Returns appropriate HTTP response.
+ */
 async function getTeamEventsStatistics(req, res) {
   try {
     const { groupBy, aggregates } = req.query;

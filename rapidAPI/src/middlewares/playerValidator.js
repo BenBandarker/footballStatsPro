@@ -1,6 +1,9 @@
 
 // Function to validate request parameters for the API
-function validateParamsApi(params) {
+function validatePlayParamsApi(params) {
+  if (!params || typeof params !== 'object') {
+    return { valid: false, message: 'Params object is missing or invalid' };
+  }
   const currentYear = new Date().getFullYear();
 
   for (const [key, value] of Object.entries(params)) {
@@ -109,7 +112,7 @@ function validateParamsDb(params) {
 }
 
 function validatePlayerParamsApi(req, res, next) {
-  const validation = validateParamsApi(req.query);
+  const validation = validatePlayParamsApi(req.query);
   if (!validation.valid) {
     return res.status(400).send(validation.message);
   }
@@ -126,5 +129,6 @@ function validatePlayerParamsDb(req, res, next) {
 
 module.exports = {
   validatePlayerParamsApi,
+  validatePlayParamsApi,
   validatePlayerParamsDb,
 };

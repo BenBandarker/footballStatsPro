@@ -9,5 +9,4 @@ router.get('/get', validateTournamentParamsDb, tournamentController.getTournamen
 router.delete('/delete', validateTournamentParamsDb, tournamentController.deleteTournamentsDb);
 router.put('/update', validateTournamentParamsDb, tournamentController.updateTournamentsDb);
 
-
 module.exports = router;

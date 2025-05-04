@@ -1,12 +1,16 @@
 const playerService = require('../services/playerService');
 
-
-async function importPlayers(req, res) {
+// Import data from API and insert into the database.
+// Accepts request parameters (req.query) and a boolean flag internalCall.
+// Returns an HTTP response or an array of players if internalCall is true.
+async function importPlayers(req, res, internalCall = false) {
   try {
     const params = req.query;
 
     const players = await playerService.getPlayersFromApi(params); // Fetch players from the API
     if (players.length === 0) {
+      if (internalCall) 
+        return []; // Return empty array if called internally
       return res.status(404).send('No players found');
     }
     // Save players to the database
@@ -23,13 +27,19 @@ async function importPlayers(req, res) {
         }
       }
     }
+    if (internalCall) return players;
     res.status(201).send('Players imported successfully');
   } catch (error) {
     console.error(error);
+    if (internalCall) throw error;
     res.status(500).send('Error importing players');
   }
 }
 
+
+// Search data in the external API.
+// Accepts request parameters (req.query).
+// Returns an HTTP response with players or 404 if none found.
 async function searchPlayers(req, res) {
   try {
     const params = req.query;
@@ -45,6 +55,10 @@ async function searchPlayers(req, res) {
   }
 }
 
+
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
 async function getPlayersFromDb(req, res) {
   try {
     const filters = req.query;
@@ -60,6 +74,10 @@ async function getPlayersFromDb(req, res) {
   }
 }
 
+
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
 async function deletePlayersFromDb(req, res) {
   try {
     const filters = req.query;
@@ -75,6 +93,9 @@ async function deletePlayersFromDb(req, res) {
   }
 }
 
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response or data object.
 async function updatePlayersInDb(req, res) {
   try {
     const params = req.query;
@@ -97,79 +118,10 @@ async function updatePlayersInDb(req, res) {
   }
 }
 
-// async function importPlayersbyTeam(req, res) {
-//   try {
-//     const currentYear = new Date().getFullYear();
-//     const { season, team_api_id } = req.params;
-//     if (!season || typeof season !== 'number' || season < 2000 || season > currentYear) {
-//       return res.status(400).send('Invalid season parameter');
-//     }
-//     if (!team_api_id || typeof team_api_id !== 'number') {
-//       return res.status(400).send('Invalid team_api_id parameter');
-//     }
-//     const players = await fetchData('apiOne',`v3/players?team=${team_api_id}&season=${season}`); // Replace with the correct endpoint
-//     if(players.length === 0){
-//       res.status(404).send('No tournaments found');
-//     }
-//     else{
-//       // Code to save players to the database using SQL
-//       for(const player of players){
-//         const params = [player.id,
-//           player.player.name,
-//           player.player.birth.date,
-//           player.player.position,
-//           player.player.nationality,];
-         
-//           const insertQuery = `INSERT INTO Players (player_api_id, player_name, date_of_birth, position, nationality) VALUES (?, ?, ?, ?, ?)`;
-        
-//           await executeQuery(insertQuery, params);
-//         };
-      
-//       res.status(201).send('Players imported successfully');
-//     }
-//   } catch (error) {
-//     res.status(500).send('Error importing players');
-//   }
-// }
-
-// async function importPlayersbyName(req, res) {
-//     try {
-//       const { name } = req.params;
-//       if (!name || typeof name !== 'string') {
-//         return res.status(400).send('Invalid name parameter');
-//       }
-//       const players = await fetchData('apiOne',`v3/players/profiles?search=${name}`);
-
-//       if(players.length === 0){
-//         res.status(404).send('No tournaments found');
-//       }
-//       else{
-//         // Code to save players to the database using SQL
-//         for(const player of players){
-//           const params = [player.id,
-//             player.name,
-//             player.birth.date,
-//             player.position,
-//             player.nationality,];
-           
-//             const insertQuery = `INSERT INTO Players (player_api_id, player_name, date_of_birth, position, nationality) VALUES (?, ?, ?, ?, ?)`;
-          
-//             await executeQuery(insertQuery, params);
-//           };
-        
-//         res.status(201).send('Players imported successfully');
-//       }
-//     } catch (error) {
-//       res.status(500).send('Error importing players');
-//     }
-//   }
-
 module.exports = { 
   importPlayers,
   searchPlayers,
   getPlayersFromDb,
   deletePlayersFromDb,
   updatePlayersInDb
-  // importPlayersbyTeam,
-  // importPlayersbyName
 };

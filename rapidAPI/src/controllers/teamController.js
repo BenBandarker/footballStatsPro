@@ -1,11 +1,17 @@
 const teamService = require('../services/teamService');
 
-async function importTeams(req, res) {
+
+// Import data from API and insert into the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
+async function importTeams(req, res, internalCall = false) {
   try {
     const params = req.query;
     const teams = await teamService.getTeamsFromApi(params); // Fetch teams from the API
 
     if (!teams || teams.length === 0) {
+      if (internalCall) 
+        return [];
       return res.status(404).send('No teams found');
     }
 
@@ -31,13 +37,20 @@ async function importTeams(req, res) {
       }
     }
 
+    if (internalCall) 
+      return teams; // Return teams if called internally
     res.status(201).send('Teams imported successfully');
   } catch (error) {
     console.error('Failed to import teams:', error);
+    if (internalCall)
+      throw error; // Rethrow error if called internally
     res.status(500).send('Error importing teams');
   }
 }
 
+// Search data in the database or external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function searchTeams(req, res) {
   try {
     const params = req.query;
@@ -54,6 +67,9 @@ async function searchTeams(req, res) {
   }
 }
 
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTeamDb(req, res) {
   try {
     const params = req.query; // Get dynamic parameters from req.query
@@ -66,6 +82,9 @@ async function getTeamDb(req, res) {
   }
 }
 
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function deleteTeamsDb(req, res) {
   try {
     const params = req.query;
@@ -81,29 +100,31 @@ async function deleteTeamsDb(req, res) {
     }
   }
   
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
+async function updateTeamsDb(req, res) {
+  try{
+    const params = req.query;
 
-  async function updateTeamsDb(req, res) {
-    try{
-      const params = req.query;
-
-      const { team_id, team_api_id, ...updateFields} = params;
-      if( !team_id && !team_api_id){
-        return res.status(400).send('No fields provided for Where clause');
-      }
-
-      if(Object.keys(updateFields).length === 0){
-        return res.status(400).send('No fields provided for update');
-      }
-
-      const result = await teamService.updateTeamssInDb({ team_id, team_api_id }, updateFields);
-      if(result.affectedRows === 0){
-        return res.status(404).send('No teams found to update');
-      }
-      res.status(200).send('Team updated successfully');
-    } catch (error){
-      console.error(error);
-      res.status(400).send('Error updating team');
+    const { team_id, team_api_id, ...updateFields} = params;
+    if( !team_id && !team_api_id){
+      return res.status(400).send('No fields provided for Where clause');
     }
+
+    if(Object.keys(updateFields).length === 0){
+      return res.status(400).send('No fields provided for update');
+    }
+
+    const result = await teamService.updateTeamssInDb({ team_id, team_api_id }, updateFields);
+    if(result.affectedRows === 0){
+      return res.status(404).send('No teams found to update');
+    }
+    res.status(200).send('Team updated successfully');
+  } catch (error){
+    console.error(error);
+    res.status(400).send('Error updating team');
+  }
 }
 
 module.exports = { importTeams, searchTeams, getTeamDb, deleteTeamsDb , updateTeamsDb };

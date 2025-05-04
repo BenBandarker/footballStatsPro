@@ -5,6 +5,9 @@ const teamsRoutes = require('./routes/teamRoutes');
 const playersRoutes = require('./routes/playerRoutes');
 const matchesRoutes = require('./routes/matchRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const { importAllData } = require('./controllers/importController');
+const { validateTournamentParamsApi } = require('./middlewares/tournamentValidator');
+
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +19,10 @@ app.use('/teams', teamsRoutes);
 app.use('/players', playersRoutes);
 app.use('/matches', matchesRoutes);
 app.use('/stats', statsRoutes);
+
+// Route for full data import
+app.post('/importAll', validateTournamentParamsApi, importAllData);
+
 try{
   initializeDatabase().then(() => {
     app.listen(port, () => {

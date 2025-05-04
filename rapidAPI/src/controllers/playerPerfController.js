@@ -1,11 +1,17 @@
 const statsService = require('../services/playerPerfService');
 
-async function importPlayersPerf(req, res) {
+// Import data from API and insert into the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
+async function importPlayersPerf(req, res, internalCall = false) {
   try {
     const params = req.query;
 
     const playersStats = await statsService.fetchPlayerPerformanceFromApi(params);
     if (playersStats.length === 0) {
+      if (internalCall) {
+        return []; // Return an empty array for internal calls
+      }
       return res.status(404).send('No players stats found');
     }
     // Save players stats to the database
@@ -24,14 +30,20 @@ async function importPlayersPerf(req, res) {
         }
       }
     }
-
+    if ( internalCall ) 
+      return playersStats; // Return the players stats for internal calls
     res.status(201).send('Players stats imported successfully');
   } catch (error) {
     console.error(error);
+    if (internalCall) 
+      throw error; // Rethrow the error for internal calls
     res.status(500).send('Error importing players stats');
   }
 }
 
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getPlayersPerfDb(req, res) {
   try {
     const filters = req.query;
@@ -47,6 +59,9 @@ async function getPlayersPerfDb(req, res) {
   }
 }
 
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function deletePlayersPerfFromDb(req, res) {
   try {
     const filters = req.query;
@@ -62,6 +77,9 @@ async function deletePlayersPerfFromDb(req, res) {
   }
 }
 
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function updatePlayersPerfInDb(req, res) {
   try {
     const params = req.query;
@@ -84,6 +102,19 @@ async function updatePlayersPerfInDb(req, res) {
   }
 }
 
+/**
+ * Retrieve data from the database.
+ * Accepts request and response objects (req, res).
+ * Example: req.query = {
+ *   groupBy: 'player_id',
+ *   aggregates: JSON.stringify([
+ *     { field: 'goals', operation: 'SUM' },
+ *     { field: 'minutes_played', operation: 'AVG' }
+ *   ]),
+ *   filters: JSON.stringify({ match_id: 101, team_id: 22 })
+ * }
+ * Returns appropriate HTTP response.
+ */
 async function getPlayerPerformanceStatistics(req, res) {
   try {
     const { groupBy, aggregates } = req.query;

@@ -1,11 +1,16 @@
 const statsService = require('../services/teamStatsService');
 
-async function importTeamsStats(req, res) {
+// Import data from API and insert into the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
+async function importTeamsStats(req, res, internalCall = false) {
   try {
     const params = req.query;
 
     const teamsStats = await statsService.fetchTeamStatsFromApi(params);
     if (teamsStats.length === 0) {
+      if( internalCall ) 
+        return [];
       return res.status(404).send('No teams stats found');
     }
     
@@ -22,13 +27,21 @@ async function importTeamsStats(req, res) {
         }
       }
     }
+
+    if(internalCall) 
+      return teamsStats; // Return teamsStats if called internally
     res.status(201).send('Teams stats imported successfully');
   } catch (error) {
     console.error(error);
+    if(internalCall) 
+      throw error;
     res.status(500).send('Error importing teams stats');
   }
 }
 
+// Retrieve data from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTeamsStatsDb(req, res) {
   try {
     const filters = req.query;
@@ -44,6 +57,9 @@ async function getTeamsStatsDb(req, res) {
   }
 }
 
+// Delete specific records from the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function deleteTeamsStatsFromDb(req, res) {
   try {
     const filters = req.query;
@@ -63,6 +79,9 @@ async function deleteTeamsStatsFromDb(req, res) {
 
 }   
 
+// Update existing records in the database.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function updateTeamsStatsInDb(req, res) {
   try {
     const params = req.query;
@@ -85,6 +104,20 @@ async function updateTeamsStatsInDb(req, res) {
   }
 }
 
+
+/**
+ * Retrieve data from the database.
+ * Accepts request and response objects (req, res).
+ * Example: req.query = {
+ *   groupBy: 'team_id',
+ *   aggregates: JSON.stringify([
+ *     { field: 'shots_on_goal', operation: 'SUM' },
+ *     { field: 'shots_outsidebox', operation: 'AVG' }
+ *   ]),
+ *   filters: JSON.stringify({ match_id: 101, team_id: 22 })
+ * }
+ * Returns appropriate HTTP response.
+ */
 async function getTeamMatchStatsStatistics(req, res) {
   try {
     const { groupBy, aggregates } = req.query;

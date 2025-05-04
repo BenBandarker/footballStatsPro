@@ -1,5 +1,8 @@
 
-function validateParamsApi(params) {
+function validateMatParamsApi(params) {
+  if (!params || typeof params !== 'object') {
+    return { valid: false, message: 'Params object is missing or invalid' };
+  }
   const currentYear = new Date().getFullYear();
 
   for (const [key, value] of Object.entries(params)) {
@@ -129,7 +132,7 @@ function validateParamsDb(params) {
 
 
 function validateMatchParamsApi(req, res, next) {
-  const validation = validateParamsApi(req.query);
+  const validation = validateMatParamsApi(req.query);
   if (!validation.valid) {
     return res.status(400).send(validation.message);
   }
@@ -146,5 +149,6 @@ function validateMatchParamsDb(req, res, next) {
 
 module.exports = {
   validateMatchParamsApi,
+  validateMatParamsApi,
   validateMatchParamsDb,
 };

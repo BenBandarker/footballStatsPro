@@ -73,6 +73,9 @@ function validateTopStatsAPI(req, res, next) {
 }
 
 function validateTeamStatsParamsApi(params) { 
+  if (!params || typeof params !== 'object') {
+    return { valid: false, message: 'Params object is missing or invalid' };
+  }
   if(!params.fixture || !params.team) {
     return { valid: false, message: 'Missing required parameters: fixture and team' };
   }
@@ -155,6 +158,9 @@ function validateTeamMatchStatsDb(req, res, next) {
 }
 
 function validatePlayerPerfParamApi(params) {
+  if (!params || typeof params !== 'object') {
+    return { valid: false, message: 'Params object is missing or invalid' };
+  }
   if(!params.fixture || !params.team) {
     return { valid: false, message: 'Missing required parameters: fixture and team' };
   }
@@ -265,6 +271,9 @@ function validatePlayerPerformanceDb(req, res, next) {
 }
 
 function validateEventParamApi(params) {
+  if (!params || typeof params !== 'object') {
+    return { valid: false, message: 'Params object is missing or invalid' };
+  }
   if(!params.fixture ) {
     return { valid: false, message: 'Missing required parameters: fixture' };
   }
@@ -443,10 +452,13 @@ function validateEventStatisticsParams(req, res, next) {
 module.exports = {
   validateTopStatsAPI,
   validateTeamStatsAPI,
+  validateTeamStatsParamsApi,
   validatePlayerPerfAPI,
+  validatePlayerPerfParamApi,
   validateTeamMatchStatsDb,
   validatePlayerPerformanceDb,
   validateEventAPI,
+  validateEventParamApi,
   validateEventsDb,
   validatePlayerStatisticsParams,
   validateTeamMatchStatisticsParams,

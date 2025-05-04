@@ -1,5 +1,8 @@
 const topService = require('../services/topStatsService');
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getStandingsByTournamentApi(req, res) {
   try {
     const params = req.query;
@@ -15,6 +18,9 @@ async function getStandingsByTournamentApi(req, res) {
   }
 }
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTopScorersByTournamentApi(req, res) {
   try {
     const params = req.query;
@@ -30,6 +36,9 @@ async function getTopScorersByTournamentApi(req, res) {
   }
 }
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTopAssistsByTournamentApi(req, res) {
   try {
     const params = req.query;
@@ -46,6 +55,9 @@ async function getTopAssistsByTournamentApi(req, res) {
 
 }
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTopRedCardsByTournamentApi(req, res) {
   try {
     const params = req.query;
@@ -62,6 +74,9 @@ async function getTopRedCardsByTournamentApi(req, res) {
 
 }
 
+// Search data in the external API.
+// Accepts request and response objects (req, res).
+// Returns appropriate HTTP response.
 async function getTopYellowCardsByTournamentApi(req, res) {
   try {
     const params = req.query;

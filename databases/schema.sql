@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS Matches (
     match_status ENUM('Scheduled', 'In Play	', 'Finished', 'Postponed', 'Cancelled', 'Abandoned', 'Not Played'),
     home_team_score INT,
     away_team_score INT,
-    FOREIGN KEY (home_team_id) REFERENCES Teams(team_api_id),
-    FOREIGN KEY (away_team_id) REFERENCES Teams(team_api_id),
-    FOREIGN KEY (tournament_id) REFERENCES Tournaments(tournament_api_id)
+    FOREIGN KEY (home_team_id) REFERENCES Teams(team_api_id) ON DELETE SET NULL,
+    FOREIGN KEY (away_team_id) REFERENCES Teams(team_api_id) ON DELETE SET NULL,
+    FOREIGN KEY (tournament_id) REFERENCES Tournaments(tournament_api_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS Player_Performance (
@@ -114,14 +114,14 @@ CREATE TABLE IF NOT EXISTS Team_Events (
     event_id INT PRIMARY KEY AUTO_INCREMENT,
     match_id BIGINT NOT NULL,
     team_id BIGINT NOT NULL,
-    player_id BIGINT,
-    assist_id BIGINT,
+    player_id BIGINT DEFAULT NULL,
+    assist_id BIGINT DEFAULT NULL,
     event_type ENUM('Goal', 'Corner', 'Offside', 'Foul', 'Penalty', 'Card', 'Subst', 'Var'),
     event_time INT NOT NULL,
     event_extra INT,
     FOREIGN KEY (match_id) REFERENCES Matches(match_api_id),
     FOREIGN KEY (team_id) REFERENCES Teams(team_api_id),
-    FOREIGN KEY (player_id) REFERENCES Players(player_api_id),
-    FOREIGN KEY (assist_id) REFERENCES Players(player_api_id),
-    UNIQUE KEY unique_event (match_id, team_id, event_time, event_type)
+    FOREIGN KEY (player_id) REFERENCES Players(player_api_id) ON DELETE SET NULL,
+    FOREIGN KEY (assist_id) REFERENCES Players(player_api_id) ON DELETE SET NULL,
+    UNIQUE KEY unique_event (match_id, team_id, player_id, event_time, event_type)
 );

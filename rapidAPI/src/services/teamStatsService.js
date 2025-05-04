@@ -25,7 +25,6 @@ function buildParams(rawParams, options = {}) {
   const { floatFields = [], booleanFields = [], enumFieldIndex = null, enumMap = {} } = options;
 
   return rawParams.map((value, index) => {
-    // כל ערך חסר → null
     if (value === undefined || value === null) {
       return null;
     }

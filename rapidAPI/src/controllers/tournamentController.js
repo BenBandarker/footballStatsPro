@@ -3,11 +3,13 @@ const tournamentService = require('../services/tournamentService'); // Import th
 // Handles the tournament import process: validates query parameters,
 // fetches tournament data from an external API, and saves it to the database.
 // Returns appropriate responses based on success, empty results, or errors.
-async function importTournaments(req, res) {
+async function importTournaments(req, res, internalCall = false) {
   try {
     const params = req.query;
   const tournaments = await tournamentService.getTournamentsFromApi(params); // Fetch tournaments from the API
     if (tournaments.length === 0) {
+      if ( internalCall ) 
+        return [];
       return res.status(404).send('No tournaments found');
     }
 
@@ -25,11 +27,12 @@ async function importTournaments(req, res) {
         }
       }
     }
-
+    if (internalCall) return tournaments; // Return tournaments if called internally
     res.status(201).send('Tournaments imported successfully');
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error importing tournaments');
+    if (internalCall) throw error;
+    return res.status(500).send("Error importing tournaments");
   }
 }
 
