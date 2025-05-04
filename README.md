@@ -51,7 +51,8 @@ The Soccer Stats project is designed to handle data related to soccer, including
 1. Navigate to the `/api` folder.  
 2. Run the FastAPI/Flask server using:  
    ```bash
-   python main.py
+   cd rapidAPI
+   node src/app.js
    ```  
 3. Test endpoints using Postman or Swagger UI.  
 
