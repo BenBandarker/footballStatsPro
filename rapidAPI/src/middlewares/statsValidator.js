@@ -374,7 +374,7 @@ function validatePlayerStatisticsParams(req, res, next) {
   const aggregateItems = aggregates.split(',');
 
   for (const item of aggregateItems) {
-    const [func, field] = item.split('_');
+    const [func, field] = item.split(':');
     if (!['sum', 'avg', 'count'].includes(func.toLowerCase())) {
       return res.status(400).send(`Invalid aggregate function: ${func}`);
     }
@@ -406,7 +406,7 @@ function validateTeamMatchStatisticsParams(req, res, next) {
   const aggregateItems = aggregates.split(',');
 
   for (const item of aggregateItems) {
-    const [func, field] = item.split('_');
+    const [func, field] = item.split(':');
     if (!['sum', 'avg', 'count'].includes(func.toLowerCase())) {
       return res.status(400).send(`Invalid aggregate function: ${func}`);
     }
@@ -436,7 +436,7 @@ function validateEventStatisticsParams(req, res, next) {
   const aggregateItems = aggregates.split(',');
 
   for (const item of aggregateItems) {
-    const [func, field] = item.split('_');
+    const [func, field] = item.split(':');
     if (!['sum', 'avg', 'count'].includes(func.toLowerCase())) {
       return res.status(400).send(`Invalid aggregate function: ${func}`);
     }

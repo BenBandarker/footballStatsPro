@@ -94,7 +94,7 @@ async function getPlayerPerformanceStatistics({ groupBy, aggregates }) {
     }
 
     const selectFields = aggregates.map(agg => {
-        const [func, field] = agg.split('_');
+        const [func, field] = agg.split(':');
         return `${func.toUpperCase()}(${field}) AS ${func.toLowerCase()}_${field}`;
     });
 

@@ -16,20 +16,23 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-let requestCount = 0;
-const REQUEST_LIMIT = 30;
-const DELAY_MS = 60000;
+const REQUESTS_PER_MINUTE = 299; 
+const MIN_DELAY_BETWEEN_REQUESTS_MS = 60000 / REQUESTS_PER_MINUTE;
 
-// Maybedelay logic handler.
-// Accepts request and response objects (req, res).
-// Returns appropriate HTTP response or data object.
+let lastRequestTime = 0;
+
 async function maybeDelay() {
-    requestCount++;
-    if (requestCount % REQUEST_LIMIT === 0) {
-      console.log(`⏳ Hit ${requestCount} requests — waiting 60 seconds...`);
-      await delay(DELAY_MS);
-    }
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+
+  if (timeSinceLastRequest < MIN_DELAY_BETWEEN_REQUESTS_MS) {
+    const waitTime = MIN_DELAY_BETWEEN_REQUESTS_MS - timeSinceLastRequest;
+    console.log(`⌛ Waiting ${waitTime}ms to respect rate limit...`);
+    await delay(waitTime);
   }
+
+  lastRequestTime = Date.now();
+}
 
 // Import data from API and insert into the database.
 // Accepts request and response objects (req, res).

@@ -78,7 +78,7 @@ async function updateEvent(identifiers, updateFields) {
 }
 
 async function getTeamEventsStatistics({ groupBy, aggregates }) {
-  return await teamEventsModel.getTeamEventsStatistics({ groupBy, aggregates });
+  return await eventModel.getTeamEventsStatistics({ groupBy, aggregates });
 }
 
 module.exports = {

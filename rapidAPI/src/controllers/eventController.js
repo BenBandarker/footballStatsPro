@@ -124,7 +124,7 @@ async function getTeamEventsStatistics(req, res) {
 
     const aggregatesArray = aggregates.split(',');
 
-    const results = await teamEventsService.getTeamEventsStatistics({ groupBy, aggregates: aggregatesArray });
+    const results = await eventService.getTeamEventsStatistics({ groupBy, aggregates: aggregatesArray });
 
     if (results.length === 0) {
       return res.status(404).send('No statistics found');
