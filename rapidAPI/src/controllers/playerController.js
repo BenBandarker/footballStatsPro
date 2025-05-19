@@ -36,6 +36,10 @@ async function importPlayers(req, res, internalCall = false) {
   }
 }
 
+async function importPlayersHandler(req, res) {
+  return await importPlayers(req, res, false);
+}
+
 
 // Search data in the external API.
 // Accepts request parameters (req.query).
@@ -120,6 +124,7 @@ async function updatePlayersInDb(req, res) {
 
 module.exports = { 
   importPlayers,
+  importPlayersHandler,
   searchPlayers,
   getPlayersFromDb,
   deletePlayersFromDb,

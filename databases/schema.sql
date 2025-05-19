@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS Team_Events (
     player_id BIGINT DEFAULT NULL,
     assist_id BIGINT DEFAULT NULL,
     event_type ENUM('Goal', 'Corner', 'Offside', 'Foul', 'Penalty', 'Card', 'Subst', 'Var'),
+    event_detail VARCHAR(50),
     event_time INT NOT NULL,
     event_extra INT,
     FOREIGN KEY (match_id) REFERENCES Matches(match_api_id),

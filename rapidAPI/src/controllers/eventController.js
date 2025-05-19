@@ -40,6 +40,10 @@ async function importEvent(req, res, internalCall = false) {
   }
 }
 
+async function importEventHandler(req, res) {
+  return await importEvent(req, res, false);
+}
+
 // Retrieve data from the database.
 // Accepts request and response objects (req, res).
 // Returns appropriate HTTP response or data object.
@@ -140,6 +144,7 @@ async function getTeamEventsStatistics(req, res) {
 
 module.exports = {
   importEvent,
+  importEventHandler,
   getEventDb,
   deleteEventFromDb,
   updateEventDb,

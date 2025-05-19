@@ -37,6 +37,10 @@ async function importMatches(req, res, internalCall = false) {
   }
 }
 
+async function importMatchesHandler(req, res) {
+  return await importMatches(req, res, false);
+}
+
 // Search data in the external API.
 // Accepts request and response objects (req, res).
 // Returns appropriate HTTP response.
@@ -119,6 +123,7 @@ async function updateMatchesInDb(req, res) {
 
 module.exports = { 
   importMatches,
+  importMatchesHandler,
   searchMatches,
   getMatchesFromDb,
   deleteMatchesFromDb,

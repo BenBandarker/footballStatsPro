@@ -12,19 +12,19 @@ router.get('/topassists', validator.validateTopStatsAPI, statsController.getTopA
 router.get('/topyellowcards', validator.validateTopStatsAPI, statsController.getTopYellowCardsByTournamentApi);
 router.get('/topredcards', validator.validateTopStatsAPI, statsController.getTopRedCardsByTournamentApi);
 
-router.post('/importPlayersPerf', validator.validatePlayerPerfAPI, playerPerfController.importPlayersPerf);
+router.post('/importPlayersPerf', validator.validatePlayerPerfAPI, playerPerfController.importPlayersPerfHandler);
 router.get('/getPlayersPerf', validator.validatePlayerPerformanceDb, playerPerfController.getPlayersPerfDb);
 router.delete('/deletePlayersPerf', validator.validatePlayerPerformanceDb, playerPerfController.deletePlayersPerfFromDb);
 router.put('/updatePlayersPerf', validator.validatePlayerPerformanceDb, playerPerfController.updatePlayersPerfInDb);
 router.get('/playerStatistics',validator.validatePlayerStatisticsParams,  playerPerfController.getPlayerPerformanceStatistics);
 
-router.post('/importTeamsStats', validator.validateTeamStatsAPI, teamStatsController.importTeamsStats);
+router.post('/importTeamsStats', validator.validateTeamStatsAPI, teamStatsController.importTeamsStatsHandler);
 router.get('/getTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.getTeamsStatsDb);
 router.delete('/deleteTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.deleteTeamsStatsFromDb);
 router.put('/updateTeamsStats', validator.validateTeamMatchStatsDb, teamStatsController.updateTeamsStatsInDb);
 router.get('/teamStatistics',validator.validateTeamMatchStatisticsParams,  teamStatsController.getTeamMatchStatsStatistics);
 
-router.post('/importEvents', validator.validateEventAPI, eventController.importEvent);
+router.post('/importEvents', validator.validateEventAPI, eventController.importEventHandler);
 router.get('/getEvents', validator.validateEventsDb, eventController.getEventDb);
 router.delete('/deleteEvents', validator.validateEventsDb, eventController.deleteEventFromDb);
 router.put('/updateEvents', validator.validateEventsDb, eventController.updateEventDb);

@@ -36,6 +36,10 @@ async function importTournaments(req, res, internalCall = false) {
   }
 }
 
+async function importTournamentsHandler(req, res) {
+  return await importTournaments(req, res, false);
+}
+
 // Searches for tournaments using API query parameters provided in the request.
 // Accepts query parameters such as country and season through `req.query`.
 // Returns a list of tournaments from the external API or an error message if none found.
@@ -114,4 +118,11 @@ async function updateTournamentsDb(req, res) {
   }
 }
 
-module.exports = { importTournaments, searchTournaments, getTournamentsDb, deleteTournamentsDb, updateTournamentsDb };
+module.exports = { 
+  importTournaments, 
+  importTournamentsHandler, 
+  searchTournaments, 
+  getTournamentsDb, 
+  deleteTournamentsDb, 
+  updateTournamentsDb 
+};

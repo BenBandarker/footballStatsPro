@@ -41,6 +41,10 @@ async function importPlayersPerf(req, res, internalCall = false) {
   }
 }
 
+async function importPlayersPerfHandler(req, res) {
+  return await importPlayersPerf(req, res, false);
+}
+
 // Retrieve data from the database.
 // Accepts request and response objects (req, res).
 // Returns appropriate HTTP response.
@@ -140,6 +144,7 @@ async function getPlayerPerformanceStatistics(req, res) {
 
 module.exports = {
   importPlayersPerf,
+  importPlayersPerfHandler,
   getPlayersPerfDb,
   deletePlayersPerfFromDb,
   updatePlayersPerfInDb,

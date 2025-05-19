@@ -3,7 +3,7 @@ const teamController = require('../controllers/teamController');
 const { validateTeamParamsApi, validateTeamParamsDb } = require('../middlewares/teamValidator');
 const router = express.Router();
 
-router.post('/import', validateTeamParamsApi, teamController.importTeams);
+router.post('/import', validateTeamParamsApi, teamController.importTeamsHandler);
 router.get('/search', validateTeamParamsApi, teamController.searchTeams);
 router.get('/get', validateTeamParamsDb, teamController.getTeamDb);
 router.delete('/delete', validateTeamParamsDb, teamController.deleteTeamsDb);

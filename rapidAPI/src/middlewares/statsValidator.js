@@ -335,7 +335,11 @@ function validateEventsParamsDb(params) {
           return { valid: false, message: `Invalid event_type value: ${value}` };
         }
         break;
-
+      case 'event_detail':
+        if (typeof value !== 'string') {
+          return { valid: false, message: `Invalid event_detail value: ${value}` };
+        }
+        break;
       default:
         return { valid: false, message: `Unknown or invalid parameter: ${key}` };
     }
@@ -420,7 +424,7 @@ function validateTeamMatchStatisticsParams(req, res, next) {
 
 function validateEventStatisticsParams(req, res, next) {
   const allowedFields = [
-    'event_id', 'match_id', 'team_id', 'player_id', 'assist_id', 'event_time', 'event_extra'
+    'event_id', 'match_id', 'team_id', 'player_id', 'assist_id', 'event_detail', 'event_time', 'event_extra'
   ];
 
   const { groupBy, aggregates } = req.query;

@@ -3,7 +3,7 @@ const tournamentController = require('../controllers/tournamentController');
 const { validateTournamentParamsApi, validateTournamentParamsDb } = require('../middlewares/tournamentValidator');
 const router = express.Router();
 
-router.post('/import', validateTournamentParamsApi, tournamentController.importTournaments);
+router.post('/import', validateTournamentParamsApi, tournamentController.importTournamentsHandler);
 router.get('/search', validateTournamentParamsApi, tournamentController.searchTournaments);
 router.get('/get', validateTournamentParamsDb, tournamentController.getTournamentsDb);
 router.delete('/delete', validateTournamentParamsDb, tournamentController.deleteTournamentsDb);

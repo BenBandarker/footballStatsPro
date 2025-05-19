@@ -80,24 +80,49 @@ async function findTeamStatsByFilters(filters) {
     return await executeQuery(query, queryParams);
 }
 
+const joinMetadata = {
+    'player_id': {
+      table: 'Players',
+      on: 'Player_Performance.player_id = Players.player_api_id',
+      extraFields: ['player_Fname', 'player_Lname']
+    },
+    'team_id': {
+      table: 'Teams',
+      on: 'Team_Match_Stats.team_id = Teams.team_api_id',
+      extraFields: ['team_name']
+    },
+    'match_id': {
+      table: 'Matches',
+      on: 'Team_Events.match_id = Matches.match_api_id',
+      extraFields: ['match_date']
+    }
+  };
+
 async function getTeamMatchStatsStatistics({ groupBy, aggregates }) {
     if (!groupBy || !aggregates || aggregates.length === 0) {
-      throw new Error('Missing groupBy or aggregates parameters');
+        throw new Error('Missing groupBy or aggregates parameters');
     }
-  
+
+    const joinInfo = joinMetadata[groupBy] || null;
+
     const selectFields = aggregates.map(agg => {
-      const [func, field] = agg.split(':');
-      return `${func.toUpperCase()}(${field}) AS ${func.toLowerCase()}_${field}`;
+        const [func, field] = agg.split(':');
+        return `${func.toUpperCase()}(${field}) AS ${func.toLowerCase()}_${field}`;
     });
-  
+
+    const extraFields = joinInfo ? joinInfo.extraFields.map(f => `${joinInfo.table}.${f}`) : [];
+    const selectClause = [groupBy, ...extraFields, ...selectFields].join(', ');
+    const joinClause = joinInfo ? `LEFT JOIN ${joinInfo.table} ON ${joinInfo.on}` : '';
+
     const query = `
-      SELECT ${groupBy}, ${selectFields.join(', ')}
-      FROM Team_Match_Stats
-      GROUP BY ${groupBy}
+        SELECT ${selectClause}
+        FROM Team_Match_Stats
+        ${joinClause}
+        GROUP BY ${groupBy}
     `;
-  
+
     return await executeQuery(query);
-  }
+}
 
 module.exports = {
     insertTeamStats,

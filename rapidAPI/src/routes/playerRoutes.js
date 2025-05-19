@@ -3,7 +3,7 @@ const playerController = require('../controllers/playerController');
 const { validatePlayerParamsApi, validatePlayerParamsDb } = require('../middlewares/playerValidator');
 const router = express.Router();
 
-router.post('/import', validatePlayerParamsApi, playerController.importPlayers);
+router.post('/import', validatePlayerParamsApi, playerController.importPlayersHandler);
 router.get('/search', validatePlayerParamsApi, playerController.searchPlayers);
 router.get('/get', validatePlayerParamsDb, playerController.getPlayersFromDb);
 router.delete('/delete', validatePlayerParamsDb, playerController.deletePlayersFromDb);

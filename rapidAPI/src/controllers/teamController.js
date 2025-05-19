@@ -39,13 +39,17 @@ async function importTeams(req, res, internalCall = false) {
 
     if (internalCall) 
       return teams; // Return teams if called internally
-    res.status(201).send('Teams imported successfully');
+    return res.status(201).send('Teams imported successfully');
   } catch (error) {
     console.error('Failed to import teams:', error);
     if (internalCall)
       throw error; // Rethrow error if called internally
-    res.status(500).send('Error importing teams');
+    return res.status(500).send('Error importing teams');
   }
+}
+
+async function importTeamsHandler(req, res) {
+  return await importTeams(req, res, false);
 }
 
 // Search data in the database or external API.
@@ -127,4 +131,4 @@ async function updateTeamsDb(req, res) {
   }
 }
 
-module.exports = { importTeams, searchTeams, getTeamDb, deleteTeamsDb , updateTeamsDb };
+module.exports = { importTeams, searchTeams, getTeamDb, deleteTeamsDb , updateTeamsDb , importTeamsHandler };

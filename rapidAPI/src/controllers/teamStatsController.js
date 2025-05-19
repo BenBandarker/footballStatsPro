@@ -39,6 +39,10 @@ async function importTeamsStats(req, res, internalCall = false) {
   }
 }
 
+async function importTeamsStatsHandler(req, res) {
+  return await importTeamsStats(req, res, false);
+}
+
 // Retrieve data from the database.
 // Accepts request and response objects (req, res).
 // Returns appropriate HTTP response.
@@ -143,6 +147,7 @@ async function getTeamMatchStatsStatistics(req, res) {
 
 module.exports = {
   importTeamsStats,
+  importTeamsStatsHandler,
   getTeamsStatsDb,
   deleteTeamsStatsFromDb,
   updateTeamsStatsInDb,

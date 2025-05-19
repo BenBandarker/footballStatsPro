@@ -28,6 +28,7 @@ async function saveEventToDatabase(match_id, event) {
     parseInt(event?.player?.id),                   // player_id
     parseInt(event?.assist?.id),                   // assist_id
     typeof event?.type === 'string' ? event.type : null,   // event_type
+    typeof event?.detail === 'string' ? event.detail : null, // event_detail
     parseInt(event?.time?.elapsed),                // event_time
     event?.time?.extra !== undefined ? parseInt(event.time.extra) : null // event_extra
   ];
@@ -44,12 +45,12 @@ async function saveEventToDatabase(match_id, event) {
     return val;
   });
 
-  if (safeParams.length !== 7) {
+  if (safeParams.length !== 8) {
     console.error(`Param length mismatch: expected 7, got ${safeParams.length}`);
     return;
   }
 
-  console.log('Attempting to insert event with params:', safeParams);
+  // console.log('Attempting to insert event with params:', safeParams);
 
   try {
     await eventModel.insertEvent(safeParams);
