@@ -28,6 +28,7 @@ async function saveTeamToDatabase(team, venueName){
     team.country,
     team.founded,
     venueName,
+    team.logo
   ];
   
   await Team.insertTeam(params);

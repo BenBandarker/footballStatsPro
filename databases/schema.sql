@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS Teams (
     team_name VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     founded_year INT,
-    stadium_name VARCHAR(100)
+    stadium_name VARCHAR(100),
+    logo_url VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Players (
@@ -25,7 +26,8 @@ CREATE TABLE IF NOT EXISTS Tournaments (
     tournament_name VARCHAR(100) NOT NULL,
     start_date DATE,
     end_date DATE,
-    location VARCHAR(50)
+    location VARCHAR(50),
+    logo_url VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Matches (

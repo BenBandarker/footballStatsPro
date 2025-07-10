@@ -39,7 +39,8 @@ async function savePlayerToDatabase(player) {
     player.player.nationality,
     parseNumericField(player.player.height),
     parseNumericField(player.player.weight),
-    player.player.photo,];
+    player.player.photo,
+  ];
        
   await Player.insertPlayer(sanitizeParams(params));
     

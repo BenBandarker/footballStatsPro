@@ -32,6 +32,7 @@ async function saveTournamentToDatabase(tournament) {
     tournament.seasons[tournament.seasons.length - 1].start,
     tournament.seasons[tournament.seasons.length - 1].end,
     tournament.country.name,
+    tournament.league.logo
   ];
 
   await Tournament.insertTournament(params);

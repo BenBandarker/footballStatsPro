@@ -1,7 +1,7 @@
 const { executeQuery } = require('../services/databaseService');
 
 async function insertTeam(params){
-    const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name) VALUES (?, ?, ?, ?, ?)`;
+    const insertQuery = `INSERT INTO Teams (team_api_id, team_name,country, founded_year, stadium_name, logo_url) VALUES (?, ?, ?, ?, ?, ?)`;
 
   return await executeQuery(insertQuery, params);
 }

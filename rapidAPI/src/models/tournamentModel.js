@@ -3,8 +3,8 @@ const { executeQuery } = require('../services/databaseService');
 async function insertTournament(params) {
     const insertQuery = `
         INSERT INTO Tournaments 
-        (tournament_api_id, tournament_name, start_date, end_date, location)
-        VALUES (?, ?, ?, ?, ?)
+        (tournament_api_id, tournament_name, start_date, end_date, location, logo_url)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
     return await executeQuery(insertQuery, params);
 }
