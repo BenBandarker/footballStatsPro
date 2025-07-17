@@ -124,17 +124,6 @@ FOOTBALLSTATSPRO/
 
 ---
 
-## **Contributing**  
-1. Fork the repository.  
-2. Create a feature branch:  
-   ```bash
-   git checkout -b feature-name
-   ```  
-3. Commit your changes and push them.  
-4. Create a pull request.  
-
----
-
 ## **Future Features**  
 - Real-time match updates via a WebSocket API.  
 - Advanced ML models for real-time game analytics.  
